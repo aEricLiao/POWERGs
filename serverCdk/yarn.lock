@@ -204,6 +204,14 @@
     "@aws-cdk/region-info" "1.106.1"
     constructs "^3.3.69"
 
+"@aws-cdk/aws-kinesisfirehose@1.106.1":
+  version "1.106.1"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-kinesisfirehose/-/aws-kinesisfirehose-1.106.1.tgz#42be1e3e2030031448cf3229e05348324747acce"
+  integrity sha512-T03QQMN9dBtiBI9PelxhzKllgMYwSvA+CuggqOIRpouRQ7LVlZlB5Zu4ekGaK1blslR8AQbnsRqiGHClo7CYaw==
+  dependencies:
+    "@aws-cdk/core" "1.106.1"
+    constructs "^3.3.69"
+
 "@aws-cdk/aws-kms@1.106.1":
   version "1.106.1"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-kms/-/aws-kms-1.106.1.tgz#77df2e8018ec88aaf87a3437c1e1e67d4bed7f98"

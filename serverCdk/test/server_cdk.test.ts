@@ -10,6 +10,7 @@ test('ServerCdk contains some resources', () => {
   expectCDK(stack).to(haveResource('AWS::Lambda::Function', { Runtime: "nodejs14.x" }));
   expectCDK(stack).to(haveResource('AWS::S3::Bucket', { BucketName: 'powergs-dev-logs' }));
   expectCDK(stack).to(haveResource('AWS::S3::Bucket', { BucketName: 'powergs-dev-ems' }));
+  expectCDK(stack).to(haveResource('AWS::KinesisFirehose::DeliveryStream', { DeliveryStreamName: 'lambdaLog' }));
 });
 
 test('ServerCdk accepts env context', () => {
