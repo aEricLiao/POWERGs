@@ -1,7 +1,7 @@
 export const get = async (event: any) => {
-  console.log(event);
+  console.log(event)
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: "Hello POWERGs!" })
+    body: JSON.stringify({ message: 'Hello POWERGs!' }),
   }
 }
