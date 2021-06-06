@@ -1,0 +1,4 @@
+{
+  "authentication.login": "login",
+  "authentication.logout": "logout"
+}

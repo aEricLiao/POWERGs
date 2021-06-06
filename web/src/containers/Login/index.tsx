@@ -6,12 +6,15 @@ import { RoutePath } from '@src/constants/routePath'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import CircularProgress from '@material-ui/core/CircularProgress'
+import { useIntl } from 'react-intl'
+import messages from './messages'
 
 const Login = () => {
   const isFetching = useAppSelector((state) => state.authentication.isFetching)
   const isLogin = useAppSelector((state) => state.authentication.status)
   const dispatch = useAppDispatch()
   const history = useHistory()
+  const { formatMessage } = useIntl()
   useEffect(() => {
     if (isLogin) {
       history.push(RoutePath.profile)
@@ -30,13 +33,13 @@ const Login = () => {
           variant="contained"
           color="primary"
           onClick={() => dispatch(login())}>
-          login
+          {formatMessage(messages.login)}
         </Button>
         <Button
           variant="contained"
           color="primary"
           onClick={() => dispatch(logout())}>
-          logout
+          {formatMessage(messages.logout)}
         </Button>
       </Grid>
       <Grid item>{isFetching && <CircularProgress />}</Grid>
