@@ -1,0 +1,9 @@
+{
+  "src/i18n/*.json": [
+    "npm run extract-locale"
+  ],
+  "src/**/*.{js,jsx,ts,tsx}": [
+    "prettier --write",
+    "eslint --ext .ts --ext .tsx src"
+  ]
+}

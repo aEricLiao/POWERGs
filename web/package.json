@@ -30,9 +30,12 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test",
+    "test": "craco test --watchAll=false",
     "eject": "craco eject",
-    "lint": "eslint --ext .ts --ext .tsx src"
+    "lint": "eslint --ext .ts --ext .tsx src",
+    "extract-locale": "extract-messages -l=en,ja -o src/i18n -d en --flat 'src/**/messages.ts'",
+    "prepare": "cd .. && husky install web/.husky",
+    "pre-commit": "lint-staged"
   },
   "eslintConfig": {
     "extends": "react-app",
@@ -63,6 +66,9 @@
     ]
   },
   "devDependencies": {
-    "craco-alias": "^3.0.1"
+    "craco-alias": "^3.0.1",
+    "extract-react-intl-messages": "^4.1.1",
+    "husky": "^6.0.0",
+    "lint-staged": "^11.0.0"
   }
 }

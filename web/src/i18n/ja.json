@@ -1,4 +1,4 @@
 {
-  "authentication.login": "login",
-  "authentication.logout": "logout"
+  "authentication.login": "",
+  "authentication.logout": ""
 }
