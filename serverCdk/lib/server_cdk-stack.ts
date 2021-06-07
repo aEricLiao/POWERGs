@@ -4,6 +4,7 @@ import * as apigateway from '@aws-cdk/aws-apigateway'
 import * as s3 from '@aws-cdk/aws-s3'
 import * as firehose from '@aws-cdk/aws-kinesisfirehose'
 import * as iam from '@aws-cdk/aws-iam'
+import * as dynamodb from '@aws-cdk/aws-dynamodb'
 
 export class ServerCdkStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -11,13 +12,29 @@ export class ServerCdkStack extends cdk.Stack {
 
     const env = this.node.tryGetContext('env') || 'dev'
 
+    const messageTable = new dynamodb.Table(this, 'messageTable', {
+      tableName: 'messageTable',
+      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING }
+    })
+
     // cdk lambda-apigateway example
     const getHelloMessageLambda = new lambda.Function(this, 'getHelloMessageLambda', {
       functionName: 'getHelloMessageLambda',
       runtime: lambda.Runtime.NODEJS_14_X,
       code: lambda.Code.fromAsset('lambda/helloMessage'),
-      handler: 'index.get',
+      handler: 'indexBundle.get',
     })
+
+    const postHelloMessageLambda = new lambda.Function(this, 'postHelloMessageLambda', {
+      functionName: 'postHelloMessageLambda',
+      runtime: lambda.Runtime.NODEJS_14_X,
+      code: lambda.Code.fromAsset('lambda/helloMessage'),
+      handler: 'indexBundle.post',
+      environment: {
+        TABLE_NAME: messageTable.tableName,
+      }
+    })
+    messageTable.grantWriteData(postHelloMessageLambda)
 
     const restApi = new apigateway.RestApi(this, 'RestApi', {
       restApiName: 'test-api',
@@ -25,6 +42,7 @@ export class ServerCdkStack extends cdk.Stack {
     const helloMessageApi = restApi.root.addResource('helloMessage')
 
     helloMessageApi.addMethod('GET', new apigateway.LambdaIntegration(getHelloMessageLambda))
+    helloMessageApi.addMethod('POST', new apigateway.LambdaIntegration(postHelloMessageLambda))
 
     // S3 Buckets
     const s3Props = {

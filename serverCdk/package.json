@@ -5,7 +5,8 @@
     "server_cdk": "bin/server_cdk.js"
   },
   "scripts": {
-    "build": "tsc",
+    "clean": "tsc --build --clean",
+    "build": "tsc && webpack",
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
@@ -20,15 +21,20 @@
     "prettier": "^2.3.0",
     "ts-jest": "^26.2.0",
     "ts-node": "^9.0.0",
-    "typescript": "~3.9.7"
+    "typescript": "4.3.2",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.0"
   },
   "dependencies": {
     "@aws-cdk/aws-apigateway": "1.106.1",
+    "@aws-cdk/aws-dynamodb": "1.106.1",
     "@aws-cdk/aws-iam": "1.106.1",
     "@aws-cdk/aws-kinesisfirehose": "1.106.1",
     "@aws-cdk/aws-lambda": "1.106.1",
     "@aws-cdk/aws-s3": "1.106.1",
     "@aws-cdk/core": "1.106.1",
+    "@aws-sdk/client-dynamodb": "^3.18.0",
+    "@aws-sdk/util-dynamodb": "^3.18.0",
     "source-map-support": "^0.5.16"
   }
 }
