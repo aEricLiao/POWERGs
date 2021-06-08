@@ -5,6 +5,9 @@ import * as s3 from '@aws-cdk/aws-s3'
 import * as firehose from '@aws-cdk/aws-kinesisfirehose'
 import * as iam from '@aws-cdk/aws-iam'
 import * as dynamodb from '@aws-cdk/aws-dynamodb'
+import * as iot from '@aws-cdk/aws-iot'
+import * as kinesis from '@aws-cdk/aws-kinesis'
+import * as eventSource from '@aws-cdk/aws-lambda-event-sources'
 
 export class ServerCdkStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -94,6 +97,67 @@ export class ServerCdkStack extends cdk.Stack {
           sizeInMBs: 5, // default
         },
         compressionFormat: 'GZIP',
+      },
+    })
+
+    // Kinesis Data Stream
+    const iotInitStream = new kinesis.Stream(this, 'iotInitStream', {
+      streamName: 'iotInit',
+    })
+
+    // Lambda for IoT
+    const iotInitLambda = new lambda.Function(this, 'iotInitLambda', {
+      functionName: 'iotInit',
+      runtime: lambda.Runtime.NODEJS_14_X,
+      code: lambda.Code.fromAsset('lambda/iotInit'),
+      handler: 'index.handler',
+    })
+    iotInitLambda.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'kinesis:ListStreams',
+          'kinesis:ListShards',
+          'kinesis:GetShardIterator',
+          'kinesis:GetRecords',
+          'kinesis:DescribeStream',
+        ],
+        resources: [`arn:aws:kinesis:${this.region}:${this.account}:stream/*`],
+      })
+    )
+    iotInitLambda.addEventSource(
+      new eventSource.KinesisEventSource(iotInitStream, {
+        batchSize: 5, // default: 100
+        maxBatchingWindow: cdk.Duration.seconds(1),
+        startingPosition: lambda.StartingPosition.LATEST,
+      })
+    )
+
+    // IoT Core
+    const iotInitRuleRole = new iam.Role(this, 'iotInitRuleRole', {
+      assumedBy: new iam.ServicePrincipal('iot.amazonaws.com'),
+      path: '/service-role/',
+    })
+    iotInitRuleRole.addToPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['kinesis:PutRecord'],
+        resources: [iotInitStream.streamArn],
+      })
+    )
+    const _iotInitRule = new iot.CfnTopicRule(this, 'iotInitRule', {
+      ruleName: 'gwInit',
+      topicRulePayload: {
+        sql: "SELECT *, topic() as topic, timestamp() as timestamp FROM 'init/+/sv'",
+        awsIotSqlVersion: '2016-03-23',
+        actions: [
+          {
+            kinesis: {
+              roleArn: iotInitRuleRole.roleArn,
+              streamName: iotInitStream.streamName,
+            },
+          },
+        ],
       },
     })
   }
