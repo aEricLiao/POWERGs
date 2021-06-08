@@ -62,31 +62,30 @@ export class ServerCdkStack extends cdk.Stack {
     })
 
     // Firehose
-    const lambdaLogHoseRole = new iam.Role(this, 'lambdaLogRole', {
+    const firehoseRoleProps = {
       assumedBy: new iam.ServicePrincipal('firehose.amazonaws.com'),
       path: '/service-role/',
+    }
+    const firehoseS3PolicyStatement = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        's3:AbortMultipartUpload',
+        's3:GetBucketLocation',
+        's3:GetObject',
+        's3:ListBucket',
+        's3:ListBucketMultipartUploads',
+        's3:PutObject',
+      ],
+      resources: [logBucket.bucketArn, logBucket.arnForObjects('*')],
     })
-    lambdaLogHoseRole.addToPolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: [
-          's3:AbortMultipartUpload',
-          's3:GetBucketLocation',
-          's3:GetObject',
-          's3:ListBucket',
-          's3:ListBucketMultipartUploads',
-          's3:PutObject',
-        ],
-        resources: [logBucket.bucketArn, logBucket.arnForObjects('*')],
-      })
-    )
-    lambdaLogHoseRole.addToPolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: ['kinesis:DescribeStream', 'kinesis:GetShardIterator', 'kinesis:GetRecords', 'kinesis:ListShards'],
-        resources: [`arn:aws:kinesis:${this.region}:${this.account}:stream/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%`],
-      })
-    )
+    const firehoseKinesisPolicyStatement = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['kinesis:DescribeStream', 'kinesis:GetShardIterator', 'kinesis:GetRecords', 'kinesis:ListShards'],
+      resources: [`arn:aws:kinesis:${this.region}:${this.account}:stream/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%`],
+    })
+    const lambdaLogHoseRole = new iam.Role(this, 'lambdaLogRole', firehoseRoleProps)
+    lambdaLogHoseRole.addToPolicy(firehoseS3PolicyStatement)
+    lambdaLogHoseRole.addToPolicy(firehoseKinesisPolicyStatement)
     const _lambdaLogHose = new firehose.CfnDeliveryStream(this, 'lambdaLog', {
       deliveryStreamName: 'lambdaLog',
       extendedS3DestinationConfiguration: {
@@ -98,6 +97,22 @@ export class ServerCdkStack extends cdk.Stack {
           sizeInMBs: 5, // default
         },
         compressionFormat: 'GZIP',
+      },
+    })
+
+    const gwInitLogHoseRole = new iam.Role(this, 'gwInitLogRole', firehoseRoleProps)
+    gwInitLogHoseRole.addToPolicy(firehoseS3PolicyStatement)
+    const gwInitLogHose = new firehose.CfnDeliveryStream(this, 'gwInitLog', {
+      deliveryStreamName: 'gwInitLog',
+      extendedS3DestinationConfiguration: {
+        bucketArn: logBucket.bucketArn,
+        roleArn: gwInitLogHoseRole.roleArn,
+        prefix: 'iot_gw_init/!{timestamp: yyyy/MM/dd}/',
+        errorOutputPrefix: 'iot_gw_init/!{timestamp: yyyy/MM/dd}/!{firehose:error-output-type}/',
+        compressionFormat: 'UNCOMPRESSED',
+        encryptionConfiguration: {
+          noEncryptionConfig: 'NoEncryption',
+        },
       },
     })
 
@@ -135,17 +150,22 @@ export class ServerCdkStack extends cdk.Stack {
     )
 
     // IoT Core
-    const iotInitRuleRole = new iam.Role(this, 'iotInitRuleRole', {
+    const iotRoleProps = {
       assumedBy: new iam.ServicePrincipal('iot.amazonaws.com'),
       path: '/service-role/',
+    }
+    const kinesisPolicyStatement = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['kinesis:PutRecord'],
+      resources: [iotInitStream.streamArn],
     })
-    iotInitRuleRole.addToPolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: ['kinesis:PutRecord'],
-        resources: [iotInitStream.streamArn],
-      })
-    )
+    const firehosePolicyStatement = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['firehose:PutRecord'],
+      resources: [gwInitLogHose.attrArn],
+    })
+    const iotInitRuleRole = new iam.Role(this, 'iotInitRuleRole', iotRoleProps)
+    iotInitRuleRole.addToPolicy(kinesisPolicyStatement)
     const _iotInitRule = new iot.CfnTopicRule(this, 'iotInitRule', {
       ruleName: 'gwInit',
       topicRulePayload: {
@@ -156,6 +176,25 @@ export class ServerCdkStack extends cdk.Stack {
             kinesis: {
               roleArn: iotInitRuleRole.roleArn,
               streamName: iotInitStream.streamName,
+            },
+          },
+        ],
+      },
+    })
+    const gwInitLogRuleRole = new iam.Role(this, 'gwInitLogRuleRole', iotRoleProps)
+    gwInitLogRuleRole.addToPolicy(firehosePolicyStatement)
+    const _gwInitLogRule = new iot.CfnTopicRule(this, 'gwInitLogRule', {
+      ruleName: 'gwInitLog',
+      topicRulePayload: {
+        sql: "SELECT *, topic() as topic, timestamp() as timestamp FROM 'init/+/gw'",
+        awsIotSqlVersion: '2016-03-23',
+        ruleDisabled: false,
+        actions: [
+          {
+            firehose: {
+              deliveryStreamName: gwInitLogHose.deliveryStreamName!,
+              roleArn: gwInitLogRuleRole.roleArn,
+              batchMode: false,
             },
           },
         ],

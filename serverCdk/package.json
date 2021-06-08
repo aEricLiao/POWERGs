@@ -8,7 +8,7 @@
     "clean": "tsc --build --clean",
     "build": "tsc && webpack",
     "watch": "tsc -w",
-    "test": "jest",
+    "test": "tsc && webpack && jest",
     "cdk": "cdk",
     "format": "prettier --write '**/*.ts'"
   },
