@@ -17,7 +17,7 @@ export class ServerCdkStack extends cdk.Stack {
 
     const messageTable = new dynamodb.Table(this, 'messageTable', {
       tableName: 'messageTable',
-      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING }
+      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
     })
 
     // cdk lambda-apigateway example
@@ -35,7 +35,7 @@ export class ServerCdkStack extends cdk.Stack {
       handler: 'indexBundle.post',
       environment: {
         TABLE_NAME: messageTable.tableName,
-      }
+      },
     })
     messageTable.grantWriteData(postHelloMessageLambda)
 
@@ -156,6 +156,34 @@ export class ServerCdkStack extends cdk.Stack {
               roleArn: iotInitRuleRole.roleArn,
               streamName: iotInitStream.streamName,
             },
+          },
+        ],
+      },
+    })
+    const iotInitPolicy = new iot.CfnPolicy(this, 'iotInitPolicy', {
+      policyName: 'iotInitPolicy',
+      policyDocument: {
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Effect: 'Allow',
+            Action: 'iot:Connect',
+            Resource: `arn:aws:iot:${this.region}:${this.account}:client/*`,
+          },
+          {
+            Effect: 'Allow',
+            Action: 'iot:Publish',
+            Resource: `arn:aws:iot:${this.region}:${this.account}:topic/init/*/sv`,
+          },
+          {
+            Effect: 'Allow',
+            Action: 'iot:Receive',
+            Resource: `arn:aws:iot:${this.region}:${this.account}:topic/init/*/gw`,
+          },
+          {
+            Effect: 'Allow',
+            Action: 'iot:Subscribe',
+            Resource: `arn:aws:iot:${this.region}:${this.account}:topicfilter/init/*/gw`,
           },
         ],
       },
