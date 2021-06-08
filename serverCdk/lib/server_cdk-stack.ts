@@ -8,6 +8,7 @@ import * as dynamodb from '@aws-cdk/aws-dynamodb'
 import * as iot from '@aws-cdk/aws-iot'
 import * as kinesis from '@aws-cdk/aws-kinesis'
 import * as eventSource from '@aws-cdk/aws-lambda-event-sources'
+import * as cognito from '@aws-cdk/aws-cognito'
 
 export class ServerCdkStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -187,6 +188,17 @@ export class ServerCdkStack extends cdk.Stack {
           },
         ],
       },
+    })
+
+    // Cognito
+    const _userPool = new cognito.UserPool(this, 'userPool', {
+      userPoolName: 'userPool',
+      autoVerify: { email: true },
+      selfSignUpEnabled: true,
+      signInCaseSensitive: false,
+      standardAttributes: {
+        email: { required: true }
+      }
     })
   }
 }
