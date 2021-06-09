@@ -1,4 +1,9 @@
 {
+  "authentication.button": "パスワード設定",
+  "authentication.code": "認証コード",
+  "authentication.confirmPassword": "新しいパスワード（確認用）",
   "authentication.login": "Login",
-  "authentication.logout": "Logout"
+  "authentication.logout": "Logout",
+  "authentication.mail": "メールアドレス",
+  "authentication.newPassword": "新しいパスワード"
 }

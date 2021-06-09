@@ -1,4 +1,9 @@
 {
+  "authentication.button": "Confirm",
+  "authentication.code": "Authentication Code",
+  "authentication.confirmPassword": "New Password (Confirm)",
   "authentication.login": "Login",
-  "authentication.logout": "Logout"
+  "authentication.logout": "Logout",
+  "authentication.mail": "Email",
+  "authentication.newPassword": "New Password"
 }
