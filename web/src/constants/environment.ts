@@ -1,0 +1,1 @@
+export const AXIOS_MOCK_ENABLE = process.env.REACT_APP_AXIOS_MOCK_ENABLE

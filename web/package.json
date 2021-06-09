@@ -29,6 +29,7 @@
   },
   "scripts": {
     "start": "craco start",
+    "start-mock": "REACT_APP_AXIOS_MOCK_ENABLE=true craco start",
     "build": "craco build",
     "test": "craco test --watchAll=false",
     "eject": "craco eject",
@@ -66,6 +67,7 @@
     ]
   },
   "devDependencies": {
+    "axios-mock-adapter": "^1.19.0",
     "craco-alias": "^3.0.1",
     "extract-react-intl-messages": "^4.1.1",
     "husky": "^6.0.0",

@@ -1,24 +1,27 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import Service from '@src/services/authenticationService'
 
 export const login = createAsyncThunk(
   'authentication/login',
-  (userId, thunkAPI) => {
-    return new Promise<any>((resolve) => {
-      setTimeout(async () => {
-        resolve({})
-      }, 1000)
-    })
+  async (userId, thunkAPI) => {
+    const service = Service()
+    try {
+      await service.login()
+    } catch (error) {
+      console.error(error)
+    }
   }
 )
 
 export const logout = createAsyncThunk(
   'authentication/logout',
   async (userId, thunkAPI) => {
-    return new Promise<any>((resolve) => {
-      setTimeout(async () => {
-        resolve({})
-      }, 1000)
-    })
+    const service = Service()
+    try {
+      await service.logout()
+    } catch (error) {
+      console.error(error)
+    }
   }
 )
 
