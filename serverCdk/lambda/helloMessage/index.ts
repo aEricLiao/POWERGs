@@ -1,11 +1,12 @@
 import { DynamoDBClient, PutItemCommand, PutItemCommandInput } from '@aws-sdk/client-dynamodb'
 import { marshall } from '@aws-sdk/util-dynamodb'
+import { postLambdaLog } from 'common'
 
 const client = new DynamoDBClient({})
 const tableName = process.env.TABLE_NAME ?? ''
 
 export const get = async (event: any) => {
-  console.log(event)
+  postLambdaLog(event)
   return {
     statusCode: 200,
     body: JSON.stringify({ message: 'Hello POWERGs!' }),
@@ -13,7 +14,7 @@ export const get = async (event: any) => {
 }
 
 export const post = async (event: any) => {
-  console.log(event)
+  postLambdaLog(event)
   const id = JSON.parse(event.body).id
 
   const param: PutItemCommandInput = { TableName: tableName, Item: marshall({ id, message: 'Hello POWERGs!' }) }

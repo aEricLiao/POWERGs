@@ -22,21 +22,38 @@ export class ServerCdkStack extends cdk.Stack {
     })
 
     // cdk lambda-apigateway example
+
+    const nodeModuleLayer = new lambda.LayerVersion(this, 'nodeModuleLayer', {
+      layerVersionName: 'nodeModuleLayer',
+      code: lambda.Code.fromAsset('layer/packages'),
+      compatibleRuntimes: [lambda.Runtime.NODEJS_14_X],
+    })
+
+    const commonLayer = new lambda.LayerVersion(this, 'commonLayer', {
+      layerVersionName: 'commonLayer',
+      code: lambda.Code.fromAsset('layer/common'),
+      compatibleRuntimes: [lambda.Runtime.NODEJS_14_X],
+    })
+
+    const layers = [nodeModuleLayer, commonLayer]
+
     const getHelloMessageLambda = new lambda.Function(this, 'getHelloMessageLambda', {
       functionName: 'getHelloMessageLambda',
       runtime: lambda.Runtime.NODEJS_14_X,
       code: lambda.Code.fromAsset('lambda/helloMessage'),
-      handler: 'indexBundle.get',
+      handler: 'index.get',
+      layers,
     })
 
     const postHelloMessageLambda = new lambda.Function(this, 'postHelloMessageLambda', {
       functionName: 'postHelloMessageLambda',
       runtime: lambda.Runtime.NODEJS_14_X,
       code: lambda.Code.fromAsset('lambda/helloMessage'),
-      handler: 'indexBundle.post',
+      handler: 'index.post',
       environment: {
         TABLE_NAME: messageTable.tableName,
       },
+      layers,
     })
     messageTable.grantWriteData(postHelloMessageLambda)
 
@@ -236,8 +253,8 @@ export class ServerCdkStack extends cdk.Stack {
       selfSignUpEnabled: true,
       signInCaseSensitive: false,
       standardAttributes: {
-        email: { required: true }
-      }
+        email: { required: true },
+      },
     })
   }
 }
