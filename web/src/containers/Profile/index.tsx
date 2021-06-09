@@ -15,7 +15,7 @@ const Profile = () => {
         {isLogin ? (
           'welcome'
         ) : (
-          <Link component={RouterLink} to={RoutePath.login}>
+          <Link component={RouterLink} to={RoutePath.Login}>
             {formatMessage(messages.login)}
           </Link>
         )}

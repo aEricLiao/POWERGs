@@ -17,7 +17,7 @@ const Login = () => {
   const { formatMessage } = useIntl()
   useEffect(() => {
     if (isLogin) {
-      history.push(RoutePath.profile)
+      history.push(RoutePath.Profile)
     }
   }, [isLogin, history])
 

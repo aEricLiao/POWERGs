@@ -1,5 +1,5 @@
 export enum RoutePath {
-  root = '/',
-  login = '/login',
-  profile = '/profile',
+  Root = '/',
+  Login = '/login',
+  Profile = '/profile',
 }
