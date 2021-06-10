@@ -1,7 +1,8 @@
-// import { useAppDispatch } from '@src/reducers/hooks'
+import { useAppDispatch } from '@src/reducers/hooks'
 // import { useEffect } from 'react'
 // import { useHistory } from 'react-router-dom'
 // import { RoutePath } from '@src/constants/routePath'
+import { setPassword } from '@src/reducers/features/authentication'
 import Button from '@material-ui/core/Button'
 import OutlinedInput from '@material-ui/core/OutlinedInput'
 import { useIntl } from 'react-intl'
@@ -9,7 +10,7 @@ import messages from './messages'
 import styled from 'styled-components'
 
 const PasswordSetting = () => {
-  // const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch()
   // const history = useHistory()
   const { formatMessage } = useIntl()
 
@@ -54,7 +55,8 @@ const PasswordSetting = () => {
             type="submit"
             form="setPasswordForm"
             variant="contained"
-            color="primary">
+            color="primary"
+            onClick={() => dispatch(setPassword())}>
             {formatMessage(messages.button)}
           </Button>
         </ButtonArea>
@@ -75,6 +77,7 @@ const InputItem = styled.div`
 const GridItem = styled.div`
   display: grid;
   justify-items: center;
+  margin-top: 1rem;
 `
 const ButtonArea = styled.div`
   display: grid;

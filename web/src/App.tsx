@@ -30,11 +30,11 @@ function App() {
                 <Route path={RoutePath.Login}>
                   <Login />
                 </Route>
-                <Route path={RoutePath.Root}>
-                  <Main />
-                </Route>
                 <Route path={RoutePath.SetPassword}>
                   <PasswordSetting />
+                </Route>
+                <Route path={RoutePath.Root}>
+                  <Main />
                 </Route>
                 <Redirect to={RoutePath.Root} />
               </Switch>
