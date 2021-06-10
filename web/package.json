@@ -69,7 +69,6 @@
     ]
   },
   "devDependencies": {
-    "@types/styled-components": "^5.1.10",
     "axios-mock-adapter": "^1.19.0",
     "craco-alias": "^3.0.1",
     "extract-react-intl-messages": "^4.1.1",

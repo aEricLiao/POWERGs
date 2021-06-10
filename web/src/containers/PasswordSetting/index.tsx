@@ -4,81 +4,51 @@ import Button from '@material-ui/core/Button'
 import OutlinedInput from '@material-ui/core/OutlinedInput'
 import { useIntl } from 'react-intl'
 import messages from './messages'
-import styled from 'styled-components'
+import useStyles from './style'
 
 const PasswordSetting = () => {
   const dispatch = useAppDispatch()
   const { formatMessage } = useIntl()
+  const classes = useStyles()
 
   return (
-    <form id="setPasswordForm">
-      <GridItem>
-        <InputItem>
-          <Title>
-            <p>{formatMessage(messages.email)}:</p>
-          </Title>
-          <OutlinedInput
-            placeholder={formatMessage(messages.email)}
-            fullWidth
-          />
-        </InputItem>
-        <InputItem>
-          <Title>
-            <p>{formatMessage(messages.code)}:</p>
-          </Title>
-          <OutlinedInput placeholder={formatMessage(messages.code)} fullWidth />
-        </InputItem>
-        <InputItem>
-          <Title>
-            <p>{formatMessage(messages.newPassword)}:</p>
-          </Title>
-          <OutlinedInput
-            placeholder={formatMessage(messages.newPassword)}
-            fullWidth
-          />
-        </InputItem>
-        <InputItem>
-          <Title>
-            <p>{formatMessage(messages.confirmPassword)}:</p>
-          </Title>
-          <OutlinedInput
-            placeholder={formatMessage(messages.confirmPassword)}
-            fullWidth
-          />
-        </InputItem>
-        <ButtonArea>
-          <Button
-            type="submit"
-            form="setPasswordForm"
-            variant="contained"
-            color="primary"
-            onClick={() => dispatch(setPassword())}>
-            {formatMessage(messages.button)}
-          </Button>
-        </ButtonArea>
-      </GridItem>
+    <form id="setPasswordForm" className={classes.gridItem}>
+      <div className={classes.inputItem}>
+        <p className={classes.title}>{formatMessage(messages.email)}:</p>
+        <OutlinedInput placeholder={formatMessage(messages.email)} fullWidth />
+      </div>
+      <div className={classes.inputItem}>
+        <p className={classes.title}>{formatMessage(messages.code)}:</p>
+        <OutlinedInput placeholder={formatMessage(messages.code)} fullWidth />
+      </div>
+      <div className={classes.inputItem}>
+        <p className={classes.title}>{formatMessage(messages.newPassword)}:</p>
+        <OutlinedInput
+          placeholder={formatMessage(messages.newPassword)}
+          fullWidth
+        />
+      </div>
+      <div className={classes.inputItem}>
+        <p className={classes.title}>
+          {formatMessage(messages.confirmPassword)}:
+        </p>
+        <OutlinedInput
+          placeholder={formatMessage(messages.confirmPassword)}
+          fullWidth
+        />
+      </div>
+      <div className={classes.buttonArea}>
+        <Button
+          type="submit"
+          form="setPasswordForm"
+          variant="contained"
+          color="primary"
+          onClick={() => dispatch(setPassword())}>
+          {formatMessage(messages.button)}
+        </Button>
+      </div>
     </form>
   )
 }
-const Title = styled.div`
-  margin-right: 1rem;
-  width: 60%;
-`
-const InputItem = styled.div`
-  display: flex;
-  margin-top: 0.2rem;
-  margin-bottom: 0.2rem;
-  width: 40%;
-`
-const GridItem = styled.div`
-  display: grid;
-  justify-items: center;
-  margin-top: 1rem;
-`
-const ButtonArea = styled.div`
-  display: grid;
-  margin-top: 1rem;
-  justify-items: center;
-`
 
 export default PasswordSetting
