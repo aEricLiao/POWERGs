@@ -11,6 +11,7 @@ interface AuthenticationServiceApi {
   axiosInstance: AxiosInstance
   login: () => Promise<AxiosResponse<any>>
   logout: () => Promise<AxiosResponse<any>>
+  setPassword: () => Promise<AxiosResponse<any>>
 }
 
 const serviceCreator = (): AuthenticationServiceApi => {
@@ -19,6 +20,7 @@ const serviceCreator = (): AuthenticationServiceApi => {
     axiosInstance,
     login: () => axiosInstance.get('/login'),
     logout: () => axiosInstance.get('/logout'),
+    setPassword: () => axiosInstance.get('/setPassword'),
   }
 }
 
@@ -27,6 +29,7 @@ const mockService = (): AuthenticationServiceApi => {
   const mock = new MockAdapter(service.axiosInstance)
   mock.onGet('/login').reply(200)
   mock.onGet('/logout').reply(200)
+  mock.onGet('/setPassword').reply(200)
   return service
 }
 

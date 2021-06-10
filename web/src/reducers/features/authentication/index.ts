@@ -25,6 +25,18 @@ export const logout = createAsyncThunk(
   }
 )
 
+export const setPassword = createAsyncThunk(
+  'authentication/setPassword',
+  async (userId, thunkAPI) => {
+    const service = Service()
+    try {
+      await service.setPassword()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+)
+
 export const authenticationSlice = createSlice({
   name: 'authentication',
   initialState: {
