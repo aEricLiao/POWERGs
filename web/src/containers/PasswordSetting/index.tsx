@@ -1,7 +1,4 @@
 import { useAppDispatch } from '@src/reducers/hooks'
-// import { useEffect } from 'react'
-// import { useHistory } from 'react-router-dom'
-// import { RoutePath } from '@src/constants/routePath'
 import { setPassword } from '@src/reducers/features/authentication'
 import Button from '@material-ui/core/Button'
 import OutlinedInput from '@material-ui/core/OutlinedInput'
@@ -11,7 +8,6 @@ import styled from 'styled-components'
 
 const PasswordSetting = () => {
   const dispatch = useAppDispatch()
-  // const history = useHistory()
   const { formatMessage } = useIntl()
 
   return (
