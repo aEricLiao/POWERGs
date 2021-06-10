@@ -9,7 +9,7 @@
     "build": "yarn upgrade common && tsc",
     "watch": "tsc -w",
     "layer": "rm -rf ./layer && yarn install --production --modules-folder ./layer/packages/nodejs/node_modules && tsc && mkdir -p ./layer/common/nodejs/node_modules && cp -R ./lambda/common layer/common/nodejs/node_modules",
-    "test": "build && jest",
+    "test": "yarn build && jest",
     "cdk": "cdk",
     "format": "prettier --write '**/*.ts'"
   },
