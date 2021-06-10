@@ -77,6 +77,10 @@ export class ServerCdkStack extends cdk.Stack {
       bucketName: `powergs-${env}-ems`,
       ...s3Props,
     })
+    const _webBucket = new s3.Bucket(this, 'webBucket', {
+      bucketName: `powergs-${env}-web`,
+      ...s3Props,
+    })
 
     // Firehose
     const firehoseRoleProps = {
