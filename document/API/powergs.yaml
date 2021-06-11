@@ -272,6 +272,41 @@ paths:
               $ref: '#/components/schemas/CreateCompanyCustomerRequestBody'
             examples: {}
         description: The information required for creating 企業 or 需要家.
+  '/gateways/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    put:
+      summary: Update the gateway
+      operationId: put-gateways-id
+      responses:
+        '200':
+          description: OK
+      description: |-
+        GWの更新を行う。
+
+        同じAPIでも以下の用途ごとに更新できる内容が異なることに注意
+
+        - EMS運営企業、運用企業
+        - 企業需要家
+        - 個人需要家
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: 'Get the user from the given authorization token, and check whether the user has permission for creating record.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/UpdateGatewayForProvider'
+                - $ref: '#/components/schemas/UpdateGatewayForCustomerCompany'
+                - $ref: '#/components/schemas/UpdateGatewayForPersonalCustomer'
 components:
   schemas:
     User:
@@ -615,3 +650,74 @@ components:
           example: 101
           description: 企業型需要家
       type: integer
+    UpdateGatewayForProvider:
+      title: Update Gateway for Provider
+      type: object
+      description: Gatewayの更新を行えるフィールド（EMS運営企業・運用企業）
+      properties:
+        serial_no:
+          type: string
+          example: '00:80:27:44:BB:AF'
+        location_name:
+          type: string
+          maxLength: 100
+        installation_name:
+          type: string
+          maxLength: 30
+        installation_mailaddress:
+          type: string
+          maxLength: 254
+        installation_tel_no:
+          type: string
+          maxLength: 100
+        installation_department:
+          type: string
+          maxLength: 100
+        resource_note:
+          type: string
+          maxLength: 100
+        user_set_serial_no:
+          type: string
+        send_cycle_minute:
+          type: integer
+          minimum: 1
+          maximum: 30
+        is_stop:
+          type: boolean
+      required:
+        - serial_no
+        - location_name
+    UpdateGatewayForCustomerCompany:
+      title: Update Gateway for Customer Company
+      type: object
+      description: Gatewayの更新を行えるフィールド（企業需要家）
+      properties:
+        installation_name:
+          type: string
+          maxLength: 30
+        installation_mailaddress:
+          type: string
+          maxLength: 254
+        installation_tel_no:
+          type: string
+          maxLength: 100
+        installation_department:
+          type: string
+          maxLength: 100
+        send_cycle_minute:
+          type: integer
+          minimum: 1
+          maximum: 30
+        is_stop:
+          type: boolean
+    UpdateGatewayForPersonalCustomer:
+      title: UpdateGatewayForPersonalCustomer
+      type: object
+      description: Gatewayの更新を行えるフィールド（個人需要家）
+      properties:
+        send_cycle_minute:
+          type: integer
+          minimum: 1
+          maximum: 30
+        is_stop:
+          type: boolean
