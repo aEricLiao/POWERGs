@@ -206,7 +206,10 @@ paths:
         '500':
           description: Internal Server Error
       operationId: post-company_customers
-      description: 'API for creating 企業 or 需要家. The data is stored into table 「{EMS 企業テーブルID}_company_customer」. Use company_type to separate different types, e.g. 企業 or 需要家'
+      description: |-
+        企業・需要家を作成する API。
+        情報は 「{EMS 企業テーブルID}_company_customer」テーブルに保存される。
+        company_type で企業タイプを判断する（例：企業もしくは需要家）。各企業タイプに対応する値はモデル CompanyType を参照。
       parameters:
         - schema:
             type: string
@@ -218,7 +221,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CompanyCustomerRequestBody'
+              $ref: '#/components/schemas/CreateCompanyCustomerRequestBody'
             examples: {}
         description: The information required for creating 企業 or 需要家.
 components:
@@ -378,8 +381,8 @@ components:
         - is_administrator
         - is_alert_mailaddresses
         - company_customer_id
-    CompanyCustomerRequestBody:
-      title: CompanyCustomerRequestBody
+    CreateCompanyCustomerRequestBody:
+      title: CreateCompanyCustomerRequestBody
       type: object
       description: Request body for creating 企業 or 需要家.
       properties:
@@ -413,21 +416,19 @@ components:
           pattern: '^[0-9]{0,14}$'
           example: '09012345678'
           description: 電話番号 1
-          minLength: 0
         tel_no2:
           type: string
           maxLength: 14
           pattern: '^[0-9]{0,14}$'
           example: '09012345678'
           description: 電話番号 2
-          minLength: 0
         customer_id:
           type: string
-          pattern: '[A-Za-z0-9_-]{0,20}'
+          pattern: '^[A-Za-z0-9_-]{1,20}$'
           maxLength: 20
           description: 外部企業管理 ID。null is acceptable if company_type = 2（運用企業）
           example: XXXXX-XX_XX
-          minLength: 0
+          minLength: 1
         main_customer_support_username1:
           type: string
           maxLength: 30
@@ -459,41 +460,33 @@ components:
           type: string
           description: グループ ID 1
           example: XXXXX
-          pattern: '^[A-Za-z0-9]{0,30}$'
+          pattern: '^[A-Za-z0-9]{1,30}$'
           maxLength: 30
-          minLength: 0
+          minLength: 1
         group_id2:
           type: string
           example: AAAAA
           description: グループ ID 2
           pattern: '^[A-Za-z0-9]{0,30}$'
           maxLength: 30
-          minLength: 0
         group_id3:
           type: string
           example: BBBBB
           description: グループ ID 3
           pattern: '^[A-Za-z0-9]{0,30}$'
           maxLength: 30
-          minLength: 0
         group_id4:
           type: string
           example: CCCCC
           description: グループ ID 4
           pattern: '^[A-Za-z0-9]{0,30}$'
           maxLength: 30
-          minLength: 0
         group_id5:
           type: string
           example: DDDDD
           description: グループ ID 5
           pattern: '^[A-Za-z0-9]{0,30}$'
           maxLength: 30
-          minLength: 0
-        deleted:
-          type: boolean
-          default: false
-          description: 論理削除フラグ
       required:
         - company_type
         - name
