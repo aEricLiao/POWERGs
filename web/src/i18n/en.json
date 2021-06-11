@@ -2,8 +2,11 @@
   "authentication.button": "Confirm",
   "authentication.code": "Authentication Code",
   "authentication.confirmPassword": "New Password (Confirm)",
+  "authentication.forgotPassword": "ForgotPassword",
   "authentication.login": "Login",
-  "authentication.logout": "Logout",
+  "authentication.loginButton": "Login",
+  "authentication.loginEmail": "Email",
   "authentication.mail": "Email",
-  "authentication.newPassword": "New Password"
+  "authentication.newPassword": "New Password",
+  "authentication.password": "Password"
 }

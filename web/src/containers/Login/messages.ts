@@ -1,12 +1,20 @@
 import { defineMessages } from 'react-intl'
 
 export default defineMessages({
-  login: {
-    id: 'authentication.login',
-    defaultMessage: 'Login',
+  email: {
+    id: 'authentication.loginEmail',
+    defaultMessage: 'Email',
   },
-  logout: {
-    id: 'authentication.logout',
-    defaultMessage: 'Logout',
+  password: {
+    id: 'authentication.password',
+    defaultMessage: 'Password',
+  },
+  forgotPassword: {
+    id: 'authentication.forgotPassword',
+    defaultMessage: 'ForgotPassword',
+  },
+  loginButton: {
+    id: 'authentication.loginButton',
+    defaultMessage: 'Login',
   },
 })

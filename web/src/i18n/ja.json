@@ -2,8 +2,11 @@
   "authentication.button": "パスワード設定",
   "authentication.code": "認証コード",
   "authentication.confirmPassword": "新しいパスワード（確認用）",
-  "authentication.login": "Login",
-  "authentication.logout": "Logout",
+  "authentication.forgotPassword": "パスワードを忘れた方はこちら",
+  "authentication.login": "",
+  "authentication.loginButton": "ログイン",
+  "authentication.loginEmail": "メールアドレス",
   "authentication.mail": "メールアドレス",
-  "authentication.newPassword": "新しいパスワード"
+  "authentication.newPassword": "新しいパスワード",
+  "authentication.password": "パスワード"
 }
