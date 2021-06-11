@@ -143,6 +143,36 @@ paths:
                   dateOfBirth: '1996-08-24'
         description: Post the necessary fields for the API to create a new user.
       description: Create a new user.
+  /signup:
+    post:
+      summary: Create ユーザー.
+      tags: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: post-signup
+      description: |-
+        API for creating ユーザー.
+
+        After server return 200, server sends confirmationCode and password-setting URL to mailaddress in request body.
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: 'Get the user from the given authorization token, and check whether the user has permission for creating record.'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Signup'
   /company_customers:
     post:
       summary: Create 企業 or 需要家
@@ -215,6 +245,87 @@ components:
         - lastName
         - email
         - emailVerified
+    Signup:
+      title: Signup
+      type: object
+      description: Request body for creating ユーザー.
+      properties:
+        mailaddress:
+          type: string
+          maxLength: 254
+          example: aaaa@bbbb.cccc.cc
+        name:
+          type: string
+          maxLength: 30
+          example: Y田 T郎
+        tel_no:
+          type: string
+          pattern: '^[0-9]{0,14}'
+          maxLength: 14
+          example: '09012345678'
+        department:
+          type: string
+          maxLength: 100
+          example: ビジネス開発部
+        role:
+          type: string
+          pattern: ^(admin|user)$
+          example: admin
+        is_administrator:
+          type: boolean
+        is_alert_mailaddresses:
+          type: boolean
+        company_customer_id:
+          type: string
+          example: (株)ACCESS
+        group_id1:
+          type: string
+          description: グループ ID 1
+          example: XXXXX
+          pattern: '^[A-Za-z0-9]{0,30}$'
+          maxLength: 30
+        is_readonly_group_id1:
+          type: boolean
+        group_id2:
+          type: string
+          description: グループ ID 2
+          example: XXXXX
+          pattern: '^[A-Za-z0-9]{0,30}$'
+          maxLength: 30
+        is_readonly_group_id2:
+          type: boolean
+        group_id3:
+          type: string
+          description: グループ ID 3
+          example: XXXXX
+          pattern: '^[A-Za-z0-9]{0,30}$'
+          maxLength: 30
+        is_readonly_group_id3:
+          type: boolean
+        group_id4:
+          type: string
+          description: グループ ID 4
+          example: XXXXX
+          pattern: '^[A-Za-z0-9]{0,30}$'
+          maxLength: 30
+        is_readonly_group_id4:
+          type: boolean
+        group_id5:
+          type: string
+          description: グループ ID 5
+          example: XXXXX
+          pattern: '^[A-Za-z0-9]{0,30}$'
+          maxLength: 30
+        is_readonly_group_id5:
+          type: boolean
+      required:
+        - mailaddress
+        - name
+        - tel_no
+        - role
+        - is_administrator
+        - is_alert_mailaddresses
+        - company_customer_id
     CompanyCustomerRequestBody:
       title: CompanyCustomerRequestBody
       type: object
