@@ -12,12 +12,14 @@ const useStyles = makeStyles({
     width: '40%',
   },
   gridItem: {
-    display: 'grid',
+    display: 'flex',
+    'flex-direction': 'column',
+    'align-items': 'center',
     'justify-items': 'center',
     'margin-top': '1rem',
   },
   buttonArea: {
-    display: 'grid',
+    display: 'flex',
     'margin-top': '1rem',
     'justify-items': 'center',
   },
