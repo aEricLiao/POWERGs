@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
   title: POWERGs API
-  version: "0.0"
+  version: '0.0'
 servers:
-  - url: "http://localhost:3000"
+  - url: 'http://localhost:3000'
 paths:
-  "/users/{userId}":
+  '/users/{userId}':
     parameters:
       - schema:
           type: integer
@@ -17,12 +17,12 @@ paths:
       summary: Get User Info by User ID
       tags: []
       responses:
-        "200":
+        '200':
           description: User Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: '#/components/schemas/User'
               examples:
                 Get User Alice Smith:
                   value:
@@ -30,10 +30,10 @@ paths:
                     firstName: Alice
                     lastName: Smith
                     email: alice.smith@gmail.com
-                    dateOfBirth: "1997-10-31"
+                    dateOfBirth: '1997-10-31'
                     emailVerified: true
-                    signUpDate: "2019-08-24"
-        "404":
+                    signUpDate: '2019-08-24'
+        '404':
           description: User Not Found
       operationId: get-users-userId
       description: Retrieve the information of the user with the matching user ID.
@@ -41,12 +41,12 @@ paths:
       summary: Update User Information
       operationId: patch-users-userId
       responses:
-        "200":
+        '200':
           description: User Updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: '#/components/schemas/User'
               examples:
                 Updated User Rebecca Baker:
                   value:
@@ -54,12 +54,12 @@ paths:
                     firstName: Rebecca
                     lastName: Baker
                     email: rebecca@gmail.com
-                    dateOfBirth: "1985-10-02"
+                    dateOfBirth: '1985-10-02'
                     emailVerified: false
-                    createDate: "2019-08-24"
-        "404":
+                    createDate: '2019-08-24'
+        '404':
           description: User Not Found
-        "409":
+        '409':
           description: Email Already Taken
       description: Update the information of an existing user.
       requestBody:
@@ -74,7 +74,7 @@ paths:
                   type: string
                 email:
                   type: string
-                  description: "If a new email is given, the user's email verified property will be set to false."
+                  description: 'If a new email is given, the user''s email verified property will be set to false.'
                 dateOfBirth:
                   type: string
             examples:
@@ -87,19 +87,19 @@ paths:
               Update Last Name & Date of Birth:
                 value:
                   lastName: Baker
-                  dateOfBirth: "1985-10-02"
+                  dateOfBirth: '1985-10-02'
         description: Patch user properties to update.
   /user:
     post:
       summary: Create New User
       operationId: post-user
       responses:
-        "200":
+        '200':
           description: User Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: '#/components/schemas/User'
               examples:
                 New User Bob Fellow:
                   value:
@@ -107,12 +107,12 @@ paths:
                     firstName: Bob
                     lastName: Fellow
                     email: bob.fellow@gmail.com
-                    dateOfBirth: "1996-08-24"
+                    dateOfBirth: '1996-08-24'
                     emailVerified: false
-                    createDate: "2020-11-18"
-        "400":
+                    createDate: '2020-11-18'
+        '400':
           description: Missing Required Information
-        "409":
+        '409':
           description: Email Already Taken
       requestBody:
         content:
@@ -140,24 +140,53 @@ paths:
                   firstName: Bob
                   lastName: Fellow
                   email: bob.fellow@gmail.com
-                  dateOfBirth: "1996-08-24"
+                  dateOfBirth: '1996-08-24'
         description: Post the necessary fields for the API to create a new user.
       description: Create a new user.
+  /company_customers:
+    post:
+      summary: Create 企業 or 需要家
+      tags: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+      operationId: post-company_customers
+      description: 'API for creating 企業 or 需要家. The data is stored into table 「{EMS 企業テーブルID}_company_customer」. Use company_type to separate different types, e.g. 企業 or 需要家'
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: 'Get the user from the given authorization token, and check whether the user has permission for creating record.'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanyCustomerRequestBody'
+            examples: {}
+        description: The information required for creating 企業 or 需要家.
 components:
   schemas:
     User:
       title: User
       type: object
-      description: ""
+      description: ''
       x-examples:
         Alice Smith:
           id: 142
           firstName: Alice
           lastName: Smith
           email: alice.smith@gmail.com
-          dateOfBirth: "1997-10-31"
+          dateOfBirth: '1997-10-31'
           emailVerified: true
-          signUpDate: "2019-08-24"
+          signUpDate: '2019-08-24'
       properties:
         id:
           type: integer
@@ -172,7 +201,7 @@ components:
         dateOfBirth:
           type: string
           format: date
-          example: "1997-10-31"
+          example: '1997-10-31'
         emailVerified:
           type: boolean
           description: Set to true if the user's email has been verified.
@@ -186,3 +215,158 @@ components:
         - lastName
         - email
         - emailVerified
+    CompanyCustomerRequestBody:
+      title: CompanyCustomerRequestBody
+      type: object
+      description: Request body for creating 企業 or 需要家.
+      properties:
+        company_type:
+          $ref: '#/components/schemas/CompanyType'
+        name:
+          type: string
+          maxLength: 30
+          example: XXXXX様
+          description: お客様名・企業名
+        kana:
+          type: string
+          maxLength: 50
+          example: フリカナフリカナ
+          description: カナ
+        post_code:
+          type: string
+          pattern: '^[0-9]{7}$'
+          maxLength: 7
+          example: '1112222'
+          description: 郵便番号
+          minLength: 7
+        address:
+          type: string
+          maxLength: 100
+          example: XXXX都XXX区XXX111-111
+          description: 住所
+        tel_no1:
+          type: string
+          maxLength: 14
+          pattern: '^[0-9]{0,14}$'
+          example: '09012345678'
+          description: 電話番号 1
+          minLength: 0
+        tel_no2:
+          type: string
+          maxLength: 14
+          pattern: '^[0-9]{0,14}$'
+          example: '09012345678'
+          description: 電話番号 2
+          minLength: 0
+        customer_id:
+          type: string
+          pattern: '[A-Za-z0-9_-]{0,20}'
+          maxLength: 20
+          description: 外部企業管理 ID。null is acceptable if company_type = 2（運用企業）
+          example: XXXXX-XX_XX
+          minLength: 0
+        main_customer_support_username1:
+          type: string
+          maxLength: 30
+          example: Y山Y太
+          description: 主管担当者名 1
+        main_customer_support_username2:
+          type: string
+          maxLength: 30
+          example: XXX(株) M川M二
+          description: 主管担当者名 2
+        service_start_date:
+          type: string
+          format: date
+          example: '2021-12-01'
+          description: サービス提供開始日
+        payment:
+          type: string
+          maxLength: 100
+          description: 料金情報
+        correspond_note:
+          type: string
+          maxLength: 200
+          description: 対応履歴
+        memo:
+          type: string
+          maxLength: 200
+          description: 備考
+        group_id1:
+          type: string
+          description: グループ ID 1
+          example: XXXXX
+          pattern: '^[A-Za-z0-9]{0,30}$'
+          maxLength: 30
+          minLength: 0
+        group_id2:
+          type: string
+          example: AAAAA
+          description: グループ ID 2
+          pattern: '^[A-Za-z0-9]{0,30}$'
+          maxLength: 30
+          minLength: 0
+        group_id3:
+          type: string
+          example: BBBBB
+          description: グループ ID 3
+          pattern: '^[A-Za-z0-9]{0,30}$'
+          maxLength: 30
+          minLength: 0
+        group_id4:
+          type: string
+          example: CCCCC
+          description: グループ ID 4
+          pattern: '^[A-Za-z0-9]{0,30}$'
+          maxLength: 30
+          minLength: 0
+        group_id5:
+          type: string
+          example: DDDDD
+          description: グループ ID 5
+          pattern: '^[A-Za-z0-9]{0,30}$'
+          maxLength: 30
+          minLength: 0
+        deleted:
+          type: boolean
+          default: false
+          description: 論理削除フラグ
+      required:
+        - company_type
+        - name
+        - kana
+        - post_code
+        - address
+        - tel_no1
+        - customer_id
+        - group_id1
+    CompanyType:
+      title: CompanyType
+      description: Types for 企業
+      oneOf:
+        - properties: {}
+          example: 0
+          description: システム管理企業
+          maximum: 0
+          minimum: 0
+        - properties: {}
+          example: 1
+          description: EMS 運営企業
+          maximum: 1
+          minimum: 1
+        - properties: {}
+          example: 2
+          description: 運用企業
+          maximum: 2
+          minimum: 2
+        - properties: {}
+          example: 100
+          minimum: 100
+          maximum: 100
+          description: 個人型需要家
+        - properties: {}
+          minimum: 101
+          maximum: 101
+          example: 101
+          description: 企業型需要家
+      type: integer
