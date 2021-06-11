@@ -143,6 +143,25 @@ paths:
                   dateOfBirth: '1996-08-24'
         description: Post the necessary fields for the API to create a new user.
       description: Create a new user.
+  /gateways:
+    post:
+      summary: Create a new gateway
+      operationId: post-gateways
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGatewayForProviderRequestBody'
+      description: ''
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: 'Get the user from the given authorization token, and check whether the user has permission for creating record.'
   /signup:
     post:
       summary: Create ユーザー.
@@ -245,6 +264,39 @@ components:
         - lastName
         - email
         - emailVerified
+    CreateGatewayForProviderRequestBody:
+      title: Gateway for Provider
+      type: object
+      description: ''
+      properties:
+        serial_no:
+          type: string
+          example: '00:80:27:44:BB:AF'
+        location_name:
+          type: string
+          maxLength: 100
+        installation_name:
+          type: string
+          maxLength: 30
+        installation_mailaddress:
+          type: string
+          maxLength: 254
+        installation_tel_no:
+          type: string
+          maxLength: 100
+        installation_department:
+          type: string
+          maxLength: 100
+        resource_note:
+          type: string
+          maxLength: 100
+        send_cycle_minute:
+          type: number
+          minimum: 1
+          maximum: 30
+      required:
+        - serial_no
+        - location_name
     Signup:
       title: Signup
       type: object
