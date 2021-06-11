@@ -222,6 +222,24 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Signup'
+  /confirm_signup:
+    post:
+      summary: Send confirmation code and set user own password
+      tags: []
+      responses:
+        '200':
+          description: OK
+      operationId: post-confirm_signup
+      description: |-
+        検証コードを確認・ユーザーのパスワードを登録する API。
+        cognito で検証コードの作成から検証までを行う。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmSignupRequestBody'
+            examples: {}
+        description: The information required for confirm user signup.
   /company_customers:
     post:
       summary: Create 企業 or 需要家
@@ -309,7 +327,7 @@ components:
           description: login_id is equal to mailaddress
         password:
           type: string
-          pattern: '^[A-Za-z0-9]{8,}'
+          pattern: '^[A-Za-z0-9]{8,}$'
           minLength: 8
       required:
         - login_id
@@ -428,6 +446,30 @@ components:
         - is_administrator
         - is_alert_mailaddresses
         - company_customer_id
+    ConfirmSignupRequestBody:
+      title: ConfirmSignupRequestBody
+      type: object
+      description: Request body for send confirmation code and set password.
+      properties:
+        mailaddress:
+          type: string
+          maxLength: 254
+          example: aaaa@bbbb.cccc.cc
+        confirmation_code:
+          type: string
+          pattern: '^[0-9]{6}$'
+          maxLength: 6
+          minLength: 6
+          example: '012345'
+          description: sever send confirmation code by email
+        password:
+          type: string
+          pattern: '^[A-Za-z0-9]{8,}$'
+          minLength: 8
+      required:
+        - mailaddress
+        - confirmation_code
+        - password
     CreateCompanyCustomerRequestBody:
       title: CreateCompanyCustomerRequestBody
       type: object
