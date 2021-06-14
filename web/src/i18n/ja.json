@@ -8,5 +8,10 @@
   "authentication.loginEmail": "メールアドレス",
   "authentication.mail": "メールアドレス",
   "authentication.newPassword": "新しいパスワード",
-  "authentication.password": "パスワード"
+  "authentication.password": "パスワード",
+  "authentication.passwordChangeEmail": "メールアドレス",
+  "authentication.passwordForgotCase": "パスワードをお忘れの場合",
+  "authentication.pleaseEnterEmail": "ご登録されているメールアドレスを入力して下さい。",
+  "authentication.sendEmailButton": "メール送信",
+  "authentication.sendPasswordChangeLink": "ご登録されているメールアドレスにパスワード再設定画面のURLとパスワード再設定用認証コードを送信します。"
 }
