@@ -12,7 +12,7 @@ const PasswordChangeEmail = () => {
   const classes = useStyles()
 
   return (
-    <form id="setPasswordForm" className={classes.gridItem}>
+    <form className={classes.gridItem}>
       <div className={classes.label}>
         <h2>{formatMessage(messages.passwordForgotCase)}</h2>
         <p>{formatMessage(messages.pleaseEnterEmail)}</p>
