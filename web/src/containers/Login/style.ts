@@ -3,13 +3,13 @@ import { makeStyles } from '@material-ui/core/styles'
 const useStyles = makeStyles({
   title: {
     marginRight: '1rem',
-    width: '60%',
+    width: '35%',
   },
   inputItem: {
     display: 'flex',
     marginTop: '0.2rem',
     marginBottom: '0.2rem',
-    width: '40%',
+    width: '30%',
   },
   gridItem: {
     display: 'flex',
@@ -22,6 +22,10 @@ const useStyles = makeStyles({
     display: 'flex',
     marginTop: '1rem',
     justifyItems: 'center',
+  },
+  forgotLink: {
+    alignItems: 'center',
+    marginTop: '1rem',
   },
 })
 
