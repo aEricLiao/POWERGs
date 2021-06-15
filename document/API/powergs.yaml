@@ -240,6 +240,26 @@ paths:
               $ref: '#/components/schemas/ConfirmSignupRequestBody'
             examples: {}
         description: The information required for confirm user signup.
+  /reset_password:
+    post:
+      summary: reset password
+      tags: []
+      responses:
+        '200':
+          description: OK
+      operationId: post-reset_password
+      description: |-
+        パスワードを変更する API。
+
+        ログイン前でも呼び出すことができる。
+        cognitoのForgetPassword APIを呼び出す。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequestBody'
+            examples: {}
+        description: The information required for reset password.
   /company_customers:
     post:
       summary: Create 企業 or 需要家
@@ -505,6 +525,18 @@ components:
         - mailaddress
         - confirmation_code
         - password
+    ResetPasswordRequestBody:
+      title: ResetPasswordRequestBody
+      type: object
+      description: Request body for reset password.
+      properties:
+        login_id:
+          type: string
+          maxLength: 254
+          example: aaaa@bbbb.cccc.cc
+          description: login_id is equal to mailaddress
+      required:
+        - login_id
     CreateCompanyCustomerRequestBody:
       title: CreateCompanyCustomerRequestBody
       type: object
