@@ -192,6 +192,25 @@ paths:
           in: header
           name: Authorization
           description: 'Get the user from the given authorization token, and check whether the user has permission for creating record.'
+    get:
+      summary: Get all Gatways Info
+      operationId: get-gateways
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GatewayArray'
+      description: GWの一覧を取得
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: 'Get the user from the given authorization token, and check whether the user has permission for creating record.'
   /signup:
     post:
       summary: Create ユーザー.
@@ -299,6 +318,7 @@ paths:
         name: id
         in: path
         required: true
+        description: GWのID
     put:
       summary: Update the gateway
       operationId: put-gateways-id
@@ -327,6 +347,23 @@ paths:
                 - $ref: '#/components/schemas/UpdateGatewayForProvider'
                 - $ref: '#/components/schemas/UpdateGatewayForCustomerCompany'
                 - $ref: '#/components/schemas/UpdateGatewayForPersonalCustomer'
+    get:
+      summary: Get the Gateway Info by Id
+      operationId: get-gateways-id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Gateway'
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: 'Get the user from the given authorization token, and check whether the user has permission for creating record.'
+      description: idで指定したGWの情報を取得
 components:
   schemas:
     User:
@@ -753,3 +790,63 @@ components:
           maximum: 30
         is_stop:
           type: boolean
+    Gateway:
+      title: Gateway
+      type: object
+      description: Gatewayの情報
+      properties:
+        id:
+          type: string
+        serial_no:
+          type: string
+          description: 需要家の場合、常にnull
+          nullable: true
+        location_name:
+          type: string
+          description: 需要家の場合、常にnull
+          nullable: true
+        installation_name:
+          type: string
+          description: 個人需要家の場合、常にnull
+          nullable: true
+        installation_mailaddress:
+          type: string
+          description: 個人需要家の場合、常にnull
+          nullable: true
+        installation_tel_no:
+          type: string
+          description: 個人需要家の場合、常にnull
+          nullable: true
+        installation_department:
+          type: string
+          description: 個人需要家の場合、常にnull
+          nullable: true
+        resource_note:
+          type: string
+          description: 個人需要家の場合、常にnull
+          nullable: true
+        user_set_serial_no:
+          type: string
+        gw_first_connect_date:
+          type: string
+          format: date
+        gw_status:
+          type: string
+        gw_last_connect_date:
+          type: string
+          format: date
+        send_cycle_minute:
+          type: integer
+        is_stop:
+          type: boolean
+        deleted:
+          type: boolean
+    GatewayArray:
+      title: Gateway Array
+      type: object
+      description: Gateway情報の配列
+      properties:
+        gateways:
+          type: array
+          items:
+            $ref: '#/components/schemas/Gateway'
