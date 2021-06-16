@@ -463,18 +463,23 @@ components:
         installation_name:
           type: string
           maxLength: 30
+          nullable: true
         installation_mailaddress:
           type: string
           maxLength: 254
+          nullable: true
         installation_tel_no:
           type: string
           maxLength: 100
+          nullable: true
         installation_department:
           type: string
           maxLength: 100
+          nullable: true
         resource_note:
           type: string
           maxLength: 100
+          nullable: true
         send_cycle_minute:
           type: number
           minimum: 1
@@ -752,26 +757,34 @@ components:
         serial_no:
           type: string
           example: '00:80:27:44:BB:AF'
+          nullable: true
         location_name:
           type: string
           maxLength: 100
+          nullable: true
         installation_name:
           type: string
           maxLength: 30
+          nullable: true
         installation_mailaddress:
           type: string
           maxLength: 254
+          nullable: true
         installation_tel_no:
           type: string
           maxLength: 100
+          nullable: true
         installation_department:
           type: string
           maxLength: 100
+          nullable: true
         resource_note:
           type: string
           maxLength: 100
+          nullable: true
         user_set_serial_no:
           type: string
+          nullable: true
         send_cycle_minute:
           type: integer
           minimum: 1
@@ -789,15 +802,19 @@ components:
         installation_name:
           type: string
           maxLength: 30
+          nullable: true
         installation_mailaddress:
           type: string
           maxLength: 254
+          nullable: true
         installation_tel_no:
           type: string
           maxLength: 100
+          nullable: true
         installation_department:
           type: string
           maxLength: 100
+          nullable: true
         send_cycle_minute:
           type: integer
           minimum: 1
@@ -852,14 +869,12 @@ components:
           nullable: true
         user_set_serial_no:
           type: string
+          nullable: true
         gw_first_connect_date:
           type: string
           format: date
         gw_status:
           type: string
-        gw_last_connect_date:
-          type: string
-          format: date
         send_cycle_minute:
           type: integer
         is_stop:
