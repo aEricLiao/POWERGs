@@ -1,6 +1,6 @@
 import { DynamoDBClient, PutItemCommand, PutItemCommandInput } from '@aws-sdk/client-dynamodb'
 import { marshall } from '@aws-sdk/util-dynamodb'
-import { postLambdaLog } from '../common'
+import { postLambdaLog } from 'common'
 
 const client = new DynamoDBClient({})
 const tableName = process.env.TABLE_NAME ?? ''

@@ -1,14 +1,13 @@
 import * as cdk from '@aws-cdk/core'
 import * as lambda from '@aws-cdk/aws-lambda'
-import * as apigateway from '@aws-cdk/aws-apigateway'
 import * as s3 from '@aws-cdk/aws-s3'
 import * as firehose from '@aws-cdk/aws-kinesisfirehose'
 import * as iam from '@aws-cdk/aws-iam'
-import * as dynamodb from '@aws-cdk/aws-dynamodb'
 import * as iot from '@aws-cdk/aws-iot'
 import * as kinesis from '@aws-cdk/aws-kinesis'
 import * as eventSource from '@aws-cdk/aws-lambda-event-sources'
-import * as cognito from '@aws-cdk/aws-cognito'
+import { removalPolicy } from '../../common'
+import { firehoseRoleProps, firehoseS3PolicyStatement, firehoseKinesisPolicyStatement, iotInitLambdaKinesisPolicyStatement } from './iam'
 
 export class ServerCdkStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -16,99 +15,22 @@ export class ServerCdkStack extends cdk.Stack {
 
     const env = this.node.tryGetContext('env') || 'dev'
 
-    const messageTable = new dynamodb.Table(this, 'messageTable', {
-      tableName: 'messageTable',
-      partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
-    })
-
-    // cdk lambda-apigateway example
-
-    const nodeModuleLayer = new lambda.LayerVersion(this, 'nodeModuleLayer', {
-      layerVersionName: 'nodeModuleLayer',
-      code: lambda.Code.fromAsset('layer/packages'),
-      compatibleRuntimes: [lambda.Runtime.NODEJS_14_X],
-    })
-
-    const commonLayer = new lambda.LayerVersion(this, 'commonLayer', {
-      layerVersionName: 'commonLayer',
-      code: lambda.Code.fromAsset('layer/common'),
-      compatibleRuntimes: [lambda.Runtime.NODEJS_14_X],
-    })
-
-    const layers = [nodeModuleLayer, commonLayer]
-
-    const getHelloMessageLambda = new lambda.Function(this, 'getHelloMessageLambda', {
-      functionName: 'getHelloMessageLambda',
-      runtime: lambda.Runtime.NODEJS_14_X,
-      code: lambda.Code.fromAsset('lambda/helloMessage'),
-      handler: 'index.get',
-      layers,
-    })
-
-    const postHelloMessageLambda = new lambda.Function(this, 'postHelloMessageLambda', {
-      functionName: 'postHelloMessageLambda',
-      runtime: lambda.Runtime.NODEJS_14_X,
-      code: lambda.Code.fromAsset('lambda/helloMessage'),
-      handler: 'index.post',
-      environment: {
-        TABLE_NAME: messageTable.tableName,
-      },
-      layers,
-    })
-    messageTable.grantWriteData(postHelloMessageLambda)
-
-    const restApi = new apigateway.RestApi(this, 'RestApi', {
-      restApiName: 'test-api',
-    })
-    const helloMessageApi = restApi.root.addResource('helloMessage')
-
-    helloMessageApi.addMethod('GET', new apigateway.LambdaIntegration(getHelloMessageLambda))
-    helloMessageApi.addMethod('POST', new apigateway.LambdaIntegration(postHelloMessageLambda))
-
-    // S3 Buckets
+    // Firehose
     const s3Props = {
       enforceSSL: true,
     }
-    const logBucket = new s3.Bucket(this, 'logs', {
+    const logBucket = new s3.Bucket(this, 'logsBucket', {
       bucketName: `powergs-${env}-logs`,
       ...s3Props,
-    })
-    const _emsBucket = new s3.Bucket(this, 'ems', {
-      bucketName: `powergs-${env}-ems`,
-      ...s3Props,
-    })
-    const _webBucket = new s3.Bucket(this, 'webBucket', {
-      bucketName: `powergs-${env}-web`,
-      ...s3Props,
+      removalPolicy: removalPolicy(env),
     })
 
-    // Firehose
-    const firehoseRoleProps = {
-      assumedBy: new iam.ServicePrincipal('firehose.amazonaws.com'),
-      path: '/service-role/',
-    }
-    const firehoseS3PolicyStatement = new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: [
-        's3:AbortMultipartUpload',
-        's3:GetBucketLocation',
-        's3:GetObject',
-        's3:ListBucket',
-        's3:ListBucketMultipartUploads',
-        's3:PutObject',
-      ],
-      resources: [logBucket.bucketArn, logBucket.arnForObjects('*')],
-    })
-    const firehoseKinesisPolicyStatement = new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: ['kinesis:DescribeStream', 'kinesis:GetShardIterator', 'kinesis:GetRecords', 'kinesis:ListShards'],
-      resources: [`arn:aws:kinesis:${this.region}:${this.account}:stream/%FIREHOSE_POLICY_TEMPLATE_PLACEHOLDER%`],
-    })
     const lambdaLogHoseRole = new iam.Role(this, 'lambdaLogRole', firehoseRoleProps)
-    lambdaLogHoseRole.addToPolicy(firehoseS3PolicyStatement)
-    lambdaLogHoseRole.addToPolicy(firehoseKinesisPolicyStatement)
+    lambdaLogHoseRole.addToPolicy(firehoseS3PolicyStatement(logBucket))
+    lambdaLogHoseRole.addToPolicy(firehoseKinesisPolicyStatement(this.region, this.account))
+
     const _lambdaLogHose = new firehose.CfnDeliveryStream(this, 'lambdaLog', {
-      deliveryStreamName: 'lambdaLog',
+      deliveryStreamName: `lambdaLog-${env}`,
       extendedS3DestinationConfiguration: {
         bucketArn: logBucket.bucketArn,
         roleArn: lambdaLogHoseRole.roleArn,
@@ -122,9 +44,9 @@ export class ServerCdkStack extends cdk.Stack {
     })
 
     const gwInitLogHoseRole = new iam.Role(this, 'gwInitLogRole', firehoseRoleProps)
-    gwInitLogHoseRole.addToPolicy(firehoseS3PolicyStatement)
+    gwInitLogHoseRole.addToPolicy(firehoseS3PolicyStatement(logBucket))
     const gwInitLogHose = new firehose.CfnDeliveryStream(this, 'gwInitLog', {
-      deliveryStreamName: 'gwInitLog',
+      deliveryStreamName: `gwInitLog-${env}`,
       extendedS3DestinationConfiguration: {
         bucketArn: logBucket.bucketArn,
         roleArn: gwInitLogHoseRole.roleArn,
@@ -139,29 +61,17 @@ export class ServerCdkStack extends cdk.Stack {
 
     // Kinesis Data Stream
     const iotInitStream = new kinesis.Stream(this, 'iotInitStream', {
-      streamName: 'iotInit',
+      streamName: `iotInit-${env}`,
     })
 
     // Lambda for IoT
     const iotInitLambda = new lambda.Function(this, 'iotInitLambda', {
-      functionName: 'iotInit',
+      functionName: `iotInit-${env}`,
       runtime: lambda.Runtime.NODEJS_14_X,
       code: lambda.Code.fromAsset('lambda/iotInit'),
       handler: 'index.handler',
     })
-    iotInitLambda.addToRolePolicy(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: [
-          'kinesis:ListStreams',
-          'kinesis:ListShards',
-          'kinesis:GetShardIterator',
-          'kinesis:GetRecords',
-          'kinesis:DescribeStream',
-        ],
-        resources: [`arn:aws:kinesis:${this.region}:${this.account}:stream/*`],
-      })
-    )
+    iotInitLambda.addToRolePolicy(iotInitLambdaKinesisPolicyStatement(this.region, this.account))
     iotInitLambda.addEventSource(
       new eventSource.KinesisEventSource(iotInitStream, {
         batchSize: 5, // default: 100
@@ -188,7 +98,7 @@ export class ServerCdkStack extends cdk.Stack {
     const iotInitRuleRole = new iam.Role(this, 'iotInitRuleRole', iotRoleProps)
     iotInitRuleRole.addToPolicy(kinesisPolicyStatement)
     const _iotInitRule = new iot.CfnTopicRule(this, 'iotInitRule', {
-      ruleName: 'gwInit',
+      ruleName: `iotInitRule-${env}`,
       topicRulePayload: {
         sql: "SELECT *, topic() as topic, timestamp() as timestamp FROM 'init/+/sv'",
         awsIotSqlVersion: '2016-03-23',
@@ -205,7 +115,7 @@ export class ServerCdkStack extends cdk.Stack {
     const gwInitLogRuleRole = new iam.Role(this, 'gwInitLogRuleRole', iotRoleProps)
     gwInitLogRuleRole.addToPolicy(firehosePolicyStatement)
     const _gwInitLogRule = new iot.CfnTopicRule(this, 'gwInitLogRule', {
-      ruleName: 'gwInitLog',
+      ruleName: `gwInitLogRule-${env}`,
       topicRulePayload: {
         sql: "SELECT *, topic() as topic, timestamp() as timestamp FROM 'init/+/gw'",
         awsIotSqlVersion: '2016-03-23',
@@ -222,7 +132,7 @@ export class ServerCdkStack extends cdk.Stack {
       },
     })
     const iotInitPolicy = new iot.CfnPolicy(this, 'iotInitPolicy', {
-      policyName: 'iotInitPolicy',
+      policyName: `iotInitPolicy-${env}`,
       policyDocument: {
         Version: '2012-10-17',
         Statement: [
@@ -247,17 +157,6 @@ export class ServerCdkStack extends cdk.Stack {
             Resource: `arn:aws:iot:${this.region}:${this.account}:topicfilter/init/*/gw`,
           },
         ],
-      },
-    })
-
-    // Cognito
-    const _userPool = new cognito.UserPool(this, 'userPool', {
-      userPoolName: 'userPool',
-      autoVerify: { email: true },
-      selfSignUpEnabled: true,
-      signInCaseSensitive: false,
-      standardAttributes: {
-        email: { required: true },
       },
     })
   }

@@ -1,4 +1,4 @@
-import { expect as expectCDK, haveResource, haveResourceLike, Capture } from '@aws-cdk/assert'
+import { expect as expectCDK, haveResource, haveResourceLike, Capture, objectLike } from '@aws-cdk/assert'
 import * as cdk from '@aws-cdk/core'
 import * as ServerCdk from '../lib/server_cdk-stack'
 import { assumeRolePolicyDocument } from './utils/iam'
@@ -10,8 +10,7 @@ test('ServerCdk contains some resources', () => {
   // THEN
   expectCDK(stack).to(haveResource('AWS::Lambda::Function', { Runtime: 'nodejs14.x' }))
   expectCDK(stack).to(haveResource('AWS::S3::Bucket', { BucketName: 'powergs-dev-logs' }))
-  expectCDK(stack).to(haveResource('AWS::S3::Bucket', { BucketName: 'powergs-dev-ems' }))
-  expectCDK(stack).to(haveResource('AWS::KinesisFirehose::DeliveryStream', { DeliveryStreamName: 'lambdaLog' }))
+  expectCDK(stack).to(haveResource('AWS::KinesisFirehose::DeliveryStream', { DeliveryStreamName: 'lambdaLog-dev' }))
 })
 
 test('ServerCdk accepts env context', () => {
@@ -24,7 +23,6 @@ test('ServerCdk accepts env context', () => {
   const stack = new ServerCdk.ServerCdkStack(app, 'MyTestStack')
   // THEN
   expectCDK(stack).to(haveResource('AWS::S3::Bucket', { BucketName: 'powergs-prod-logs' }))
-  expectCDK(stack).to(haveResource('AWS::S3::Bucket', { BucketName: 'powergs-prod-ems' }))
 })
 
 describe('ServerCdk contains resources to store gateway init messages into S3', () => {
@@ -95,7 +93,7 @@ describe('ServerCdk contains resources to store gateway init messages into S3', 
 
       expectCDK(stack).to(
         haveResource('AWS::KinesisFirehose::DeliveryStream', {
-          DeliveryStreamName: 'gwInitLog',
+          DeliveryStreamName: 'gwInitLog-dev',
           ExtendedS3DestinationConfiguration: {
             CompressionFormat: 'UNCOMPRESSED',
             EncryptionConfiguration: {
@@ -125,20 +123,16 @@ describe('ServerCdk contains resources to store gateway init messages into S3', 
 
     test('has IoT topic rule and policy, and configured to deliver messages to Firehose', () => {
       const roleName = Capture.aString()
-      const ruleName = Capture.aString()
 
       expectCDK(stack).to(
         haveResource('AWS::IAM::Policy', {
           PolicyDocument: {
             Version: '2012-10-17',
             Statement: [
-              {
+              objectLike({
                 Effect: 'Allow',
                 Action: 'firehose:PutRecord',
-                Resource: {
-                  'Fn::GetAtt': [ruleName.capture(), 'Arn'],
-                },
-              },
+              }),
             ],
           },
           Roles: [
@@ -151,7 +145,7 @@ describe('ServerCdk contains resources to store gateway init messages into S3', 
 
       expectCDK(stack).to(
         haveResourceLike('AWS::IoT::TopicRule', {
-          RuleName: ruleName.capturedValue,
+          RuleName: 'gwInitLogRule-dev',
           TopicRulePayload: {
             Sql: "SELECT *, topic() as topic, timestamp() as timestamp FROM 'init/+/gw'",
             AwsIotSqlVersion: '2016-03-23',
@@ -160,7 +154,7 @@ describe('ServerCdk contains resources to store gateway init messages into S3', 
               {
                 Firehose: {
                   BatchMode: false,
-                  DeliveryStreamName: 'gwInitLog',
+                  DeliveryStreamName: 'gwInitLog-dev',
                   RoleArn: {
                     'Fn::GetAtt': [roleName.capturedValue, 'Arn'],
                   },

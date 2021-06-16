@@ -5,10 +5,10 @@
     "server_cdk": "bin/server_cdk.js"
   },
   "scripts": {
-    "clean": "tsc --build --clean",
+    "clean": "tsc --build --clean && rm -rf cdk.out",
     "build": "yarn upgrade common && tsc",
     "watch": "tsc -w",
-    "layer": "rm -rf ./layer && yarn install --production --modules-folder ./layer/packages/nodejs/node_modules && tsc && mkdir -p ./layer/common/nodejs/node_modules && cp -R ./lambda/common layer/common/nodejs/node_modules",
+    "layer": "rm -rf layer && yarn install --production --modules-folder layer/packages/nodejs/node_modules && tsc && mkdir -p layer/common/nodejs/node_modules && cp -R lambda/common layer/common/nodejs/node_modules",
     "test": "yarn build && jest",
     "cdk": "cdk",
     "format": "prettier --write '**/*.ts'"
