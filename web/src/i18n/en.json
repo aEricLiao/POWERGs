@@ -8,5 +8,10 @@
   "authentication.loginEmail": "Email",
   "authentication.mail": "Email",
   "authentication.newPassword": "New Password",
-  "authentication.password": "Password"
+  "authentication.password": "Password",
+  "authentication.passwordChangeEmail": "Email",
+  "authentication.passwordForgotCase": "Forgot password",
+  "authentication.pleaseEnterEmail": "Please enter your registered email address",
+  "authentication.sendEmailButton": "Send Email",
+  "authentication.sendPasswordChangeLink": "We will send the URL of the password reset screen and the password reset verification code to the registered e-mail address"
 }

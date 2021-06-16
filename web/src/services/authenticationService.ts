@@ -12,6 +12,7 @@ interface AuthenticationServiceApi {
   login: () => Promise<AxiosResponse<any>>
   logout: () => Promise<AxiosResponse<any>>
   setPassword: () => Promise<AxiosResponse<any>>
+  sendEmail: () => Promise<AxiosResponse<any>>
 }
 
 const serviceCreator = (): AuthenticationServiceApi => {
@@ -21,6 +22,7 @@ const serviceCreator = (): AuthenticationServiceApi => {
     login: () => axiosInstance.get('/login'),
     logout: () => axiosInstance.get('/logout'),
     setPassword: () => axiosInstance.get('/setPassword'),
+    sendEmail: () => axiosInstance.get('/passwordChangeEmail'),
   }
 }
 
@@ -30,6 +32,7 @@ const mockService = (): AuthenticationServiceApi => {
   mock.onGet('/login').reply(200)
   mock.onGet('/logout').reply(200)
   mock.onGet('/setPassword').reply(200)
+  mock.onGet('/passwordChangeEmail').reply(200)
   return service
 }
 

@@ -37,6 +37,18 @@ export const setPassword = createAsyncThunk(
   }
 )
 
+export const sendEmail = createAsyncThunk(
+  'authentication/passwordChangeEmail',
+  async (userId, thunkAPI) => {
+    const service = Service()
+    try {
+      await service.sendEmail()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+)
+
 export const authenticationSlice = createSlice({
   name: 'authentication',
   initialState: {

@@ -22,7 +22,7 @@ const Login = () => {
   }, [isLogin, history])
 
   return (
-    <form id="loginForm" className={classes.gridItem}>
+    <form className={classes.gridItem}>
       <div className={classes.inputItem}>
         <p className={classes.title}>{formatMessage(messages.email)}:</p>
         <OutlinedInput placeholder={formatMessage(messages.email)} fullWidth />

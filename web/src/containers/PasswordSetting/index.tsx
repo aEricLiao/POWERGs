@@ -12,7 +12,7 @@ const PasswordSetting = () => {
   const classes = useStyles()
 
   return (
-    <form id="setPasswordForm" className={classes.gridItem}>
+    <form className={classes.gridItem}>
       <div className={classes.inputItem}>
         <p className={classes.title}>{formatMessage(messages.email)}:</p>
         <OutlinedInput placeholder={formatMessage(messages.email)} fullWidth />
@@ -39,8 +39,6 @@ const PasswordSetting = () => {
       </div>
       <div className={classes.buttonArea}>
         <Button
-          type="submit"
-          form="setPasswordForm"
           variant="contained"
           color="primary"
           onClick={() => dispatch(setPassword())}>

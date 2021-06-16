@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import store from './reducers'
 import Login from './containers/Login'
 import PasswordSetting from './containers/PasswordSetting'
+import PasswordChangeEmail from './containers/PasswordChangeEmail'
 import {
   BrowserRouter as Router,
   Switch,
@@ -32,6 +33,9 @@ function App() {
                 </Route>
                 <Route path={RoutePath.SetPassword}>
                   <PasswordSetting />
+                </Route>
+                <Route path={RoutePath.PasswordChangeEmail}>
+                  <PasswordChangeEmail />
                 </Route>
                 <Route path={RoutePath.Root}>
                   <Main />
