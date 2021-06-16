@@ -364,6 +364,31 @@ paths:
           name: Authorization
           description: 'Get the user from the given authorization token, and check whether the user has permission for creating record.'
       description: idで指定したGWの情報を取得
+  /gateway_serials:
+    get:
+      summary: Get all Gateways serials
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewaySerialArray'
+              examples:
+                example:
+                  value:
+                    gateway_serials:
+                      - '00:80:27:44:BB:AF'
+      operationId: get-gateway_serials
+      description: 指定のドメインに紐づく企業IDが設定されているGWIDが空（未割り当て）のGW識別番号リストを取得
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: 'Get the user from the given authorization token, and check whether the user has permission for creating record.'
+    parameters: []
 components:
   schemas:
     User:
@@ -850,3 +875,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Gateway'
+    GatewaySerialArray:
+      title: GatewaySerialArray
+      type: object
+      properties:
+        gateway_serials:
+          type: array
+          items:
+            type: string
