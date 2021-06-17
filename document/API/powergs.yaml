@@ -288,10 +288,38 @@ paths:
           description: OK
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/InvalidBodyValueError'
+                  - $ref: '#/components/schemas/LackOfRequiredPropertiesForDataError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidCredentialError'
         '403':
           description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotAdminError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SameDataError'
+                  - $ref: '#/components/schemas/OldNameNotMatchedError'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
       operationId: post-company_customers
       description: |-
         企業・需要家を作成する API。
@@ -974,6 +1002,83 @@ components:
           maximum: 30
         is_stop:
           type: boolean
+    InvalidBodyValueError:
+      title: InvalidBodyValueError
+      type: object
+      description: 'The details can be found in https://docs.google.com/spreadsheets/d/1eW-LzifXowqG-ANhMrul25Y3OSeAkQBdM10FViMA2Y0/edit#gid=1356477298'
+      properties:
+        code:
+          type: string
+          example: PWG-400-E001
+        item:
+          description: 常に null。
+          nullable: true
+    LackOfRequiredPropertiesForDataError:
+      title: LackOfRequiredPropertiesForDataError
+      type: object
+      description: 'The details can be found in https://docs.google.com/spreadsheets/d/1eW-LzifXowqG-ANhMrul25Y3OSeAkQBdM10FViMA2Y0/edit#gid=1356477298'
+      properties:
+        code:
+          type: string
+          example: PWG-400-E004
+        item:
+          description: 常に null。
+          nullable: true
+    InvalidCredentialError:
+      title: InvalidCredentialError
+      type: object
+      description: 'The details can be found in https://docs.google.com/spreadsheets/d/1eW-LzifXowqG-ANhMrul25Y3OSeAkQBdM10FViMA2Y0/edit#gid=1356477298'
+      properties:
+        code:
+          type: string
+          example: PWG-401-E002
+        item:
+          description: 常に null。
+          nullable: true
+    NotAdminError:
+      title: NotAdminError
+      type: object
+      description: 'The details can be found in https://docs.google.com/spreadsheets/d/1eW-LzifXowqG-ANhMrul25Y3OSeAkQBdM10FViMA2Y0/edit#gid=1356477298'
+      properties:
+        code:
+          type: string
+          example: PWG-403-E001
+        item:
+          description: 常に null。
+          nullable: true
+    SameDataError:
+      title: SameDataError
+      type: object
+      description: 'The details can be found in https://docs.google.com/spreadsheets/d/1eW-LzifXowqG-ANhMrul25Y3OSeAkQBdM10FViMA2Y0/edit#gid=1356477298'
+      properties:
+        code:
+          type: string
+          example: PWG-409-E001
+        item:
+          type: string
+          description: メールアドレス、お客様管理 ID、GW 識別番号のいずれかの英語フィールド名。
+    OldNameNotMatchedError:
+      title: OldNameNotMatchedError
+      type: object
+      description: 'The details can be found in https://docs.google.com/spreadsheets/d/1eW-LzifXowqG-ANhMrul25Y3OSeAkQBdM10FViMA2Y0/edit#gid=1356477298'
+      properties:
+        code:
+          type: string
+          example: PWG-409-E005
+        item:
+          description: 常に null。
+          nullable: true
+    InternalError:
+      title: InternalError
+      type: object
+      description: 'The details can be found in https://docs.google.com/spreadsheets/d/1eW-LzifXowqG-ANhMrul25Y3OSeAkQBdM10FViMA2Y0/edit#gid=1356477298'
+      properties:
+        code:
+          type: string
+          example: PWG-500-E001
+        item:
+          description: 常に null。
+          nullable: true
     Gateway:
       title: Gateway
       type: object
