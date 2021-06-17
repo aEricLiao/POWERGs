@@ -49,6 +49,18 @@ export const sendEmail = createAsyncThunk(
   }
 )
 
+export const signup = createAsyncThunk(
+  'authentication/signup',
+  async (payload: Record<string, any>, thunkAPI) => {
+    const service = Service()
+    try {
+      await service.signup(payload)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+)
+
 export const authenticationSlice = createSlice({
   name: 'authentication',
   initialState: {

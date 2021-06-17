@@ -1,0 +1,31 @@
+export enum Fields {
+  Name = 'name',
+  Email = 'email',
+  Postal = 'post_code',
+  Address = 'address',
+  Tel1 = 'tel_no1',
+  Tel2 = 'tel_no2',
+  CustomerId = 'customerId',
+  MainCustomerSupportUsername1 = 'main_customer_support_username1',
+  MainCustomerSupportUsername2 = 'main_customer_support_username2',
+  ServiceStartDate = 'service_start_date',
+  Payment = 'payment',
+  CorrespondNote = 'correspond_note',
+  Memo = 'memo',
+  CompanyType = 'company_type',
+  GroupId1 = 'group_id1',
+  GroupId2 = 'group_id2',
+  GroupId3 = 'group_id3',
+  GroupId4 = 'group_id4',
+  GroupId5 = 'group_id5',
+}
+
+export const MessageKeys = {
+  ...Fields,
+  Title: 'title',
+  Required: 'required',
+  Submit: 'submit',
+  SuccessTitle: 'successTitle',
+  SuccessContent: 'successContent',
+  Close: 'close',
+}

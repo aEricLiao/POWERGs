@@ -18,6 +18,7 @@ import { IntlProvider } from 'react-intl'
 import ja from './i18n/ja.json'
 import Main from './containers/Main'
 import Box from '@material-ui/core/Box'
+import Signup from './containers/Signup'
 
 function App() {
   return (
@@ -36,6 +37,9 @@ function App() {
                 </Route>
                 <Route path={RoutePath.PasswordChangeEmail}>
                   <PasswordChangeEmail />
+                </Route>
+                <Route path={RoutePath.Signup}>
+                  <Signup />
                 </Route>
                 <Route path={RoutePath.Root}>
                   <Main />
