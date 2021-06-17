@@ -17,7 +17,12 @@ new S3BucketStack(app, `S3BucketStack-${env}`, { env })
 
 new CognitoStack(app, `CognitoStack-${env}`, { env })
 
-new ApiStack(app, `ApiStack-${env}`, { env, messageTable: dynamodbStack.messageTable })
+new ApiStack(app, `ApiStack-${env}`, 
+  { env, 
+    messageTable: dynamodbStack.messageTable,
+    userTable: dynamodbStack.userTable,
+    emsManagementCompanyTable: dynamodbStack.emsManagementCompanyTable,
+ })
 
 new ServerCdkStack(app, `ServerCdkStack-${env}`, {
   /* If you don't specify 'env', this stack will be environment-agnostic.

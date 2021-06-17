@@ -6,13 +6,15 @@ import * as apigateway from '@aws-cdk/aws-apigateway'
 interface ApiStackProps {
   env: string
   messageTable: dynamodb.Table
+  userTable: dynamodb.Table
+  emsManagementCompanyTable: dynamodb.Table
 }
 
 export class ApiStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props: ApiStackProps) {
     super(scope, id)
 
-    const { env, messageTable } = props
+    const { env, messageTable, userTable, emsManagementCompanyTable } = props
 
     const nodeModuleLayer = new lambda.LayerVersion(this, 'nodeModuleLayer', {
       layerVersionName: `nodeModuleLayer-${env}`,
@@ -44,6 +46,20 @@ export class ApiStack extends cdk.Stack {
       layers,
     })
     messageTable.grantWriteData(postHelloMessageLambda)
+
+    const userLoginLambda = new lambda.Function(this, 'userLoginLambda', {
+      functionName: `userLoginLambda-${env}`,
+      runtime: lambda.Runtime.NODEJS_14_X,
+      code: lambda.Code.fromAsset('lambda/userLogin'),
+      handler: 'index.get',
+      environment: {
+        USER_TABLE_NAME: userTable.tableName,
+        EMS_MANAGEMENT_COMPANY_TABLE_NAME: emsManagementCompanyTable.tableName,
+      },
+      layers,
+    })
+    userTable.grantReadData(userLoginLambda)
+    emsManagementCompanyTable.grantReadData(userLoginLambda)
 
     const restApi = new apigateway.RestApi(this, 'RestApi', {
       restApiName: `test-api-${env}`,
