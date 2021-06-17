@@ -298,12 +298,7 @@ paths:
         情報は 「{EMS 企業テーブルID}_company_customer」テーブルに保存される。
         company_type で企業タイプを判断する（例：企業もしくは需要家）。各企業タイプに対応する値はモデル CompanyType を参照。
       parameters:
-        - schema:
-            type: string
-          in: header
-          name: Authorization
-          description: 'Get the user from the given authorization token, and check whether the user has permission for creating record.'
-          required: true
+        - $ref: '#/components/parameters/Authorization'
       requestBody:
         content:
           application/json:
@@ -311,6 +306,89 @@ paths:
               $ref: '#/components/schemas/CreateCompanyCustomerRequestBody'
             examples: {}
         description: The information required for creating 企業 or 需要家.
+    get:
+      summary: Get the list of 企業 or 需要家
+      operationId: get-company_customers
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCompanyCustomerListResponse'
+        '500':
+          description: Internal Server Error
+      description: |-
+        企業・需要家のリストを取得する API。運用企業管理画面及び需要家管理画面で使われる。
+        レコードは 「{EMS 企業テーブルID}_company_customer」テーブルから取得する。
+
+        --
+
+        group_id_path、recursive、group_type_id の条件判断について：
+
+        例 1：group_id_path = "bbb", recursive = false, group_type_id = 2 の場合
+          - グループテーブルから _id = "bbb" のレコードを取得
+          - 取得したグループレコードの group_type_id とパラメータの group_type_id が一致していなければエラー。（URL のパラメータを勝手に書き換えられるのを防ぐため）
+          - グループレコードに紐づく企業需要家レコードリストを取得
+          - 各企業需要家レコードの group_id_path2 の最後尾が "bbb" のレコードのみを返す
+
+        例 2：group_id_path = null、recursive = false / true、group_type_id = 2 の場合
+          - 企業需要家テーブルから group_id_path2 が null のレコードを取得する
+          - 呼び出し元にルート権限がなければエラー。
+            - ルート権限を持つ条件
+              - システム管理者 admin
+              - EMS 運営企業 admin
+              - システム管理者 user 及びユーザーレコードの group_idN のグループレコードの parent_id が root
+              - EMS 運営企業 user 及びユーザーレコードの group_idN のグループレコードの parent_id が root
+          - 画面側でディレクトリまたはリスト画面を表示する可能性があるので、recursive は true でも false でも可。（group_id_path が null であれば recursive を見ないのと一緒）
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - schema:
+            type: string
+            example: '100,101'
+          in: query
+          name: company_type
+          description: The records with the given company types are sent back to the caller. Multiple values can be assigned by separated with comma. The acceptable values can refer to schema CompanyType.
+          required: true
+        - schema:
+            type: string
+            minLength: 1
+            maxLength: 20
+            pattern: '^[A-Za-z0-9_-]{1,20}$'
+            example: XXXXX-XX_XX
+          in: query
+          name: customer_id
+          description: Can be searched by the given value.
+        - schema:
+            type: string
+            example: フリカナフリカナ
+            maxLength: 50
+          in: query
+          name: kana
+          description: Can be searched by the given value.
+        - schema:
+            type: string
+            example: abc/def/
+            pattern: '^([A-Za-z0-9]{1,30}/?){1,30}$'
+          in: query
+          name: group_id_path
+          description: Group ID path. The value can be assigned as null. Only used by 需要家 or 運用企業.
+        - schema:
+            type: boolean
+            example: 'false'
+            default: 'false'
+          in: query
+          name: recursive
+          description: 'Find the company_customers recursively or not. If the given value is true and group_id_path is bbb, returns the records with group_id_path set like aaa/bbb or aaa/bbb/ccc. If the given value is false and group_id_path is bbb, returns the records with group_id_path set like aaa/bbb. Also, using group_type_id to determine which field to be compared (e.g. group_id_path1, group_id_path2, or ...etc). The field only used when group_id_path is not null. Only used by 需要家 or 運用企業.'
+        - schema:
+            type: number
+            minimum: 1
+            maximum: 5
+            example: 1
+          in: query
+          name: group_type_id
+          description: 'Used to determine which field to be compared (e.g. group_id_path1, group_id_path2, or ...etc). The field only used when group_id_path is given. Only used by 需要家 or 運用企業.'
   '/gateways/{id}':
     parameters:
       - schema:
@@ -679,37 +757,31 @@ components:
           type: string
           maxLength: 200
           description: 備考
-        group_id1:
+        group_id_path1:
           type: string
-          description: グループ ID 1
-          example: XXXXX
-          pattern: '^[A-Za-z0-9]{1,30}$'
-          maxLength: 30
-          minLength: 1
-        group_id2:
+          description: グループ ID パス 1。需要家のみグループ ID パスを設定。運用企業はグループ ID を設定。
+          example: abc/def/
+          pattern: '^([A-Za-z0-9]{1,30}/?){1,30}$'
+        group_id_path2:
           type: string
-          example: AAAAA
-          description: グループ ID 2
-          pattern: '^[A-Za-z0-9]{0,30}$'
-          maxLength: 30
-        group_id3:
+          example: abc/def/
+          description: グループ ID パス 2。需要家のみグループ ID パスを設定。運用企業はグループ ID を設定。
+          pattern: '^([A-Za-z0-9]{1,30}/?){1,30}$'
+        group_id_path3:
           type: string
-          example: BBBBB
-          description: グループ ID 3
-          pattern: '^[A-Za-z0-9]{0,30}$'
-          maxLength: 30
-        group_id4:
+          example: abc/def/
+          description: グループ ID パス 3。需要家のみグループ ID パスを設定。運用企業はグループ ID を設定。
+          pattern: '^([A-Za-z0-9]{1,30}/?){1,30}$'
+        group_id_path4:
           type: string
-          example: CCCCC
-          description: グループ ID 4
-          pattern: '^[A-Za-z0-9]{0,30}$'
-          maxLength: 30
-        group_id5:
+          example: abc/def/
+          description: グループ ID パス 4。需要家のみグループ ID パスを設定。運用企業はグループ ID を設定。
+          pattern: '^([A-Za-z0-9]{1,30}/?){1,30}$'
+        group_id_path5:
           type: string
-          example: DDDDD
-          description: グループ ID 5
-          pattern: '^[A-Za-z0-9]{0,30}$'
-          maxLength: 30
+          example: abc/def/
+          description: グループ ID パス 5。需要家のみグループ ID パスを設定。運用企業はグループ ID を設定。
+          pattern: '^([A-Za-z0-9]{1,30}/?){1,30}$'
       required:
         - company_type
         - name
@@ -718,7 +790,7 @@ components:
         - address
         - tel_no1
         - customer_id
-        - group_id1
+        - group_id_path1
     CompanyType:
       title: CompanyType
       description: Types for 企業
@@ -749,6 +821,76 @@ components:
           example: 101
           description: 企業型需要家
       type: integer
+    GetCompanyCustomerListResponse:
+      title: GetCompanyCustomerListResponse
+      type: array
+      items:
+        $ref: '#/components/schemas/CompanyCustomer'
+    CompanyCustomer:
+      title: CompanyCustomer
+      type: object
+      description: Used by model GetCompanyCustomerListResponse. Some fileds are optional based on the query parameters and caller type sent to API.
+      properties:
+        name:
+          type: string
+          maxLength: 30
+          example: XXXXX様
+          description: お客様名・企業名
+        tel_no1:
+          type: string
+          maxLength: 14
+          pattern: '^[0-9]{0,14}$'
+          example: '09012345678'
+          description: 電話番号 1
+        customer_id:
+          type: string
+          pattern: '^[A-Za-z0-9_-]{1,20}$'
+          maxLength: 20
+          description: 外部企業管理 ID
+          example: XXXXX-XX_XX
+          minLength: 1
+        group_id_path1:
+          type: string
+          description: グループ ID パス 1。需要家のみグループ ID パスを設定。運用企業はグループ ID を設定。
+          example: abc/def/
+          pattern: '^([A-Za-z0-9]{1,30}/?){1,30}$'
+        group_id_path2:
+          type: string
+          example: abc/def/
+          description: グループ ID パス 2。需要家のみグループ ID パスを設定。運用企業はグループ ID を設定。
+          pattern: '^([A-Za-z0-9]{1,30}/?){1,30}$'
+        group_id_path3:
+          type: string
+          example: abc/def/
+          description: グループ ID パス 3。需要家のみグループ ID パスを設定。運用企業はグループ ID を設定。
+          pattern: '^([A-Za-z0-9]{1,30}/?){1,30}$'
+        group_id_path4:
+          type: string
+          example: abc/def/
+          description: グループ ID パス 4。需要家のみグループ ID パスを設定。運用企業はグループ ID を設定。
+          pattern: '^([A-Za-z0-9]{1,30}/?){1,30}$'
+        group_id_path5:
+          type: string
+          example: abc/def/
+          description: グループ ID パス 5。需要家のみグループ ID パスを設定。運用企業はグループ ID を設定。
+          pattern: '^([A-Za-z0-9]{1,30}/?){1,30}$'
+        main_customer_support_username1:
+          type: string
+          maxLength: 30
+          example: Y山Y太
+          description: '主管担当者名 1。company_type = 100, 101 の場合、もしくはcompany_type = 2 及び呼び出し元の company_type = 2 の場合、null を返す。'
+          nullable: true
+        company_type:
+          description: 'company_type = 100, 101 及び呼び出し元が企業の場合以外 null を返す。'
+          oneOf:
+            - $ref: '#/components/schemas/CompanyType'
+            - properties: {}
+              nullable: true
+        deleted:
+          type: boolean
+          default: false
+          description: '論理削除フラグ。company_type = 100, 101 の場合、もしくは company_type = 2 及び呼び出し元の company_type = 2 の場合、null を返す。'
+          nullable: true
     UpdateGatewayForProvider:
       title: Update Gateway for Provider
       type: object
@@ -898,3 +1040,11 @@ components:
           type: array
           items:
             type: string
+  parameters:
+    Authorization:
+      name: Authorization
+      in: header
+      required: true
+      schema:
+        type: string
+      description: 'Get the user from the given authorization token, and check whether the user has permission for creating record.'
