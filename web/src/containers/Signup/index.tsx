@@ -2,14 +2,12 @@ import { useState, useMemo } from 'react'
 import Paper from '@material-ui/core/Paper'
 import Container from '@material-ui/core/Container'
 import Grid from '@material-ui/core/Grid'
-import { useForm, Controller } from 'react-hook-form'
-import OutlinedInput from '@material-ui/core/OutlinedInput'
+import { useForm } from 'react-hook-form'
 import { useIntl } from 'react-intl'
 import messages from './messages'
 import { Fields } from './types'
 import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
-import FormHelperText from '@material-ui/core/FormHelperText'
 import useStyles from './styles'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
@@ -18,6 +16,7 @@ import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import { signup } from '@src/reducers/features/authentication'
 import { useAppDispatch } from '@src/reducers/hooks'
+import { ControlledOutlinedInput } from '@src/components/reactHookForm/ControlledComp'
 
 interface FieldItem {
   name: string
@@ -136,28 +135,16 @@ const Signup = () => {
                   {formatMessage(messages[name])}
                 </Grid>
                 <Grid item xs={4}>
-                  <Controller
+                  <ControlledOutlinedInput
                     name={name}
                     control={control}
-                    defaultValue=""
-                    rules={{ required }}
-                    render={({ field, fieldState }) => {
-                      const error = fieldState.invalid
-                      return (
-                        <>
-                          <OutlinedInput
-                            {...field}
-                            error={error}
-                            fullWidth
-                            placeholder={formatMessage(messages[name])}
-                          />
-                          {error && (
-                            <FormHelperText error={error}>
-                              {formatMessage(messages.required)}
-                            </FormHelperText>
-                          )}
-                        </>
-                      )
+                    errorMsg={formatMessage(messages.required)}
+                    controllerProps={{
+                      rules: { required },
+                    }}
+                    componentProps={{
+                      fullWidth: true,
+                      placeholder: formatMessage(messages[name]),
                     }}
                   />
                 </Grid>
